@@ -17,13 +17,22 @@ class CompanyController extends Controller{
 
 	    $command=$connection->createCommand();
 	    $companies=(new \yii\db\Query())->select('name,link,backtrace')->from('company')->where('id>10')->all();
-	    $companies=(new \yii\db\Query())
-		        ->select('name,link,backtrace')
+	    $query=(new \yii\db\Query())
+		        //->select('c.name,c.link,c.backtrace')
+		        ->select('*')
 		        ->from('company c')
-		        ->join('company_assign ca', 'ca.company_id=c.id')
-		        ->join('service s', 'ca.service_id=s.id')
-		        ->join('device d', 'ca.device_id=d.id')
-		        ->where('c.id=1')->all();
+		        ->innerjoin('company_assign ca', 'ca.company_id=c.id')
+		        ->innerjoin('device d', 'ca.device_id=d.id')
+		        ->where('c.id=1');
+	    $companies=$query->all();
+
+	    $subQuery = (new \yii\db\Query())->select('name')->from('company')->where('id=ca.company_id');
+
+	    $query=(new \yii\db\Query())
+		    //->select('c.name,c.link,c.backtrace')
+		    ->select(['ca.id','CompName'=>$subQuery])
+		    ->from('company_assign ca');
+	    $companies=$query->all();
 
 	    //$dataReader=$command->queryAll();
 	    //$dataReader=$command->execute();
