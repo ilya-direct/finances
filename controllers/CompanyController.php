@@ -39,4 +39,19 @@ class CompanyController extends Controller{
 	    //$dataReader=$command->queryColumn();
         return $this->render('index',['companies'=>$companies]);
     }
+	public function actionRelation(){
+		$comp=company::findOne(1);
+		$ca=$comp->companyAssign;
+		//var_dump($ca);
+
+		$comp=company::findOne(2);
+		$ca=$comp->getCompanyAssign()->where(['>=','price',400])->all();
+		$ca[0]->price=401;
+
+
+		$comps=company::find()->joinWith(['companyAssign']);
+		var_dump($comps);
+//		$ca=$comps->companyAssign;
+		var_dump($ca);
+	}
 }

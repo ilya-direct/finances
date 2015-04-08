@@ -5,7 +5,7 @@ namespace app\controllers;
 use yii\web\controller;
 use app\models\company;
 
-class UsersController extends Controller{
+class FormsController extends Controller{
 
 	public function actionIndex(){
 		$companies = company::find()->all();
