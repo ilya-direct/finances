@@ -56,4 +56,9 @@ class Company extends \yii\db\ActiveRecord
             'backtrace' => 'Backtrace',
         ];
     }
+
+	public function getCompanyAssign()
+	{
+		return $this->hasMany(CompanyAssign::className(), ['company_id' => 'id']);
+	}
 }
