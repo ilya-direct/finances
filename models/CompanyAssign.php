@@ -52,4 +52,14 @@ class CompanyAssign extends \yii\db\ActiveRecord
 	{
 		return $this->hasOne(Company::className(), ['company_id' => 'id']);
 	}
+
+	public function getDevice()
+	{
+		return $this->hasOne(Device::className(), ['device_id' => 'id']);
+	}
+
+	public function getService()
+	{
+		return $this->hasOne(Service::className(), ['service_id' => 'id']);
+	}
 }

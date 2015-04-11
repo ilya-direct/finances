@@ -45,4 +45,8 @@ class Device extends \yii\db\ActiveRecord
             'type' => 'Type',
         ];
     }
+
+	public function getCompanyAssign(){
+		return $this->hasMany(CompanyAssign::className(), ['id' => 'device_id']);
+	}
 }

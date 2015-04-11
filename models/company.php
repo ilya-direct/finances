@@ -34,11 +34,22 @@ class Company extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['timecreated'], 'safe'],
-            [['name', 'link'], 'string', 'max' => 45],
+            [['name', 'link'], 'string','min'=>4, 'max' => 45],
             [['advantage', 'disadvantage', 'comment', 'backtrace'], 'string', 'max' => 100],
-            [['name'], 'unique']
+            [['name'], 'unique'],
+	        ['advantage','default', 'value' => null],
+	        ['comment','validateComment'],
         ];
     }
+
+	public function validateComment($attribute)
+    {
+	    $value = $this->$attribute;
+
+	    if (!preg_match('/mac/',$value)) {
+		    $this->addError($attribute, "((((");
+	    }
+	}
 
     /**
      * @inheritdoc

@@ -42,4 +42,8 @@ class service extends \yii\db\ActiveRecord
             'name' => 'Name',
         ];
     }
+
+	public function getCompanyAssign(){
+		return $this->hasMany(CompanyAssign::className(), ['id' => 'service_id']);
+	}
 }
