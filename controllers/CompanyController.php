@@ -3,6 +3,7 @@
 namespace app\controllers;
 use yii\web\Controller;
 use app\models\company;
+use app\models\service;
 use yii\web\YiiAsset;
 use Yii;
 
@@ -19,13 +20,14 @@ class CompanyController extends Controller{
 	    $companies=(new \yii\db\Query())->select('name,link,backtrace')->from('company')->where('id>10')->all();
 	    $query=(new \yii\db\Query())
 		        //->select('c.name,c.link,c.backtrace')
-		        ->select('*')
+		       // ->select(['company_name'=>'c.name'])
+		        ->select(array_merge(Company::getColumns(),Service::getColumns()))
 		        ->from('company c')
-		        ->innerjoin('company_assign ca', 'ca.company_id=c.id')
-		        ->innerjoin('device d', 'ca.device_id=d.id')
-		        ->where('c.id=1');
+		        ->leftjoin('company_assign ca', 'ca.company_id=c.id')
+		        ->leftjoin('device d', 'ca.device_id=d.id')
+		        ->leftjoin('device s', 'ca.service_id=s.id');
 	    $companies=$query->all();
-
+/*
 	    $subQuery = (new \yii\db\Query())->select('name')->from('company')->where('id=ca.company_id');
 
 	    $query=(new \yii\db\Query())
@@ -33,10 +35,22 @@ class CompanyController extends Controller{
 		    ->select(['ca.id','CompName'=>$subQuery])
 		    ->from('company_assign ca');
 	    $companies=$query->all();
-
+*/
 	    //$dataReader=$command->queryAll();
 	    //$dataReader=$command->execute();
 	    //$dataReader=$command->queryColumn();
+
+	    $company=Company::findOne(34);
+	    $company->name='HelloApple2';
+	    $company->link='HelloApple2.com';
+	    $company->advantage='';
+	    $company->disadvantage='';
+	    $company->comment='wewewe';
+	    if(!$company->save()){
+		    var_dump($company->getErrors('comment'));
+	    }
+	    return;
+
         return $this->render('index',['companies'=>$companies]);
     }
 	public function actionRelation(){

@@ -10,7 +10,7 @@ use Yii;
  * @property integer $id
  * @property string $name
  */
-class service extends \yii\db\ActiveRecord
+class Service extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -45,5 +45,15 @@ class service extends \yii\db\ActiveRecord
 
 	public function getCompanyAssign(){
 		return $this->hasMany(CompanyAssign::className(), ['id' => 'service_id']);
+	}
+
+	public static function getColumns($tablevar='s'){
+		$params=[];
+		$tablename=self::tableName();
+		$colums=['id','name'];
+		foreach($colums as $col){
+			$params[$tablename.'_'.$col]=$tablevar.'.'.$col;
+		}
+		return $params;
 	}
 }

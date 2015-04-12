@@ -34,11 +34,12 @@ class Company extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['timecreated'], 'safe'],
-            [['name', 'link'], 'string','min'=>4, 'max' => 45],
+            [['name', 'link'], 'string','min'=>4, 'max' => 65],
             [['advantage', 'disadvantage', 'comment', 'backtrace'], 'string', 'max' => 100],
             [['name'], 'unique'],
 	        ['advantage','default', 'value' => null],
-	        ['comment','validateComment'],
+	        ['comment','validateComment','skipOnEmpty'=>true],
+	        ['comment','default', 'value' => NULL],
         ];
     }
 
@@ -58,7 +59,7 @@ class Company extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'company_name',
             'link' => 'Link',
             'advantage' => 'Advantage',
             'disadvantage' => 'Disadvantage',
@@ -71,5 +72,15 @@ class Company extends \yii\db\ActiveRecord
 	public function getCompanyAssign()
 	{
 		return $this->hasMany(CompanyAssign::className(), ['company_id' => 'id']);
+	}
+
+	public static function getColumns($tablevar='c'){
+		$params=[];
+		$tablename=self::tableName();
+		$colums=['id','name','link','advantage','disadvantage','timecreated','comment','backtrace'];
+		foreach($colums as $col){
+			$params[$tablename.'_'.$col]=$tablevar.'.'.$col;
+		}
+		return $params;
 	}
 }
