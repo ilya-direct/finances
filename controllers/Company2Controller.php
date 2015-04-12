@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\company;
 use app\models\Company2Search;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,6 +18,16 @@ class Company2Controller extends Controller
     public function behaviors()
     {
         return [
+	        'access' =>[
+		        'class' => AccessControl::classname(),
+		        'only'=>['create','update'],
+		        'rules'=>
+			        [
+				         'allow' => true,
+				        'action'=>['index'],
+                        'roles' => ['demo'],
+			        ],
+		        ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
