@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\company;
+use app\models\device;
 use app\models\Company2Search;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -18,7 +19,7 @@ class Company2Controller extends Controller
     public function behaviors()
     {
         return [
-	        'access' =>[
+/*	        'access' =>[
 		        'class' => AccessControl::classname(),
 		        'only'=>['create','update'],
 		        'rules'=>
@@ -27,6 +28,22 @@ class Company2Controller extends Controller
 				        'action'=>['index'],
                         'roles' => ['demo'],
 			        ],
+		        ],*/
+	        'access' => [
+		        'class' => AccessControl::className(),
+		        //'only' => ['index','update','create'],
+		        'rules' => [
+			        [
+				        'allow' => true,
+				        'actions' => ['index','create','update','view'],
+				        'roles' => ['@'],
+			        ],
+			        [
+				        'allow' => true,
+				        'actions' => ['index','view'],
+				        'roles' => ['?'],
+			        ],
+			    ],
 		        ],
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -72,12 +89,14 @@ class Company2Controller extends Controller
     public function actionCreate()
     {
         $model = new company();
+        $modelDevices =Device::find()->all();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
+	            'modelDevices'=>$modelDevices
             ]);
         }
     }

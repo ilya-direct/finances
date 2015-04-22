@@ -40,12 +40,13 @@ class CompanyController extends Controller{
 	    //$dataReader=$command->execute();
 	    //$dataReader=$command->queryColumn();
 
-	    $company=Company::findOne(34);
+	    $company=Company::findOne(43);
+	    $company=is_object($company) ? $company : new company();
 	    $company->name='HelloApple2';
 	    $company->link='HelloApple2.com';
 	    $company->advantage='';
 	    $company->disadvantage='';
-	    $company->comment='wewewe';
+	    $company->comment='macbook';
 	    if(!$company->save()){
 		    var_dump($company->getErrors('comment'));
 	    }
