@@ -29,8 +29,8 @@ class CompanyAssign extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['price', 'company_id', 'device_id', 'service_id'], 'required'],
-            [['price', 'company_id', 'device_id', 'service_id'], 'integer']
+            [['price','company_id', 'device_id', 'service_id'], 'required'],
+            [['price','company_id', 'device_id', 'service_id'], 'integer']
         ];
     }
 

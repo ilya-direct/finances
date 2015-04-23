@@ -2,14 +2,21 @@
 
 namespace app\controllers;
 
+use app\models\dynamic_form;
 use Yii;
 use app\models\company;
+use app\models\companyAssign;
 use app\models\device;
+use app\models\Model;
 use app\models\Company2Search;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+use yii\helpers\ArrayHelper;
+
 
 /**
  * Company2Controller implements the CRUD actions for company model.
@@ -86,10 +93,11 @@ class Company2Controller extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+
+  /*  public function actionCreate()
     {
         $model = new company();
-        $modelDevices =Device::find()->all();
+        $modelDevices =companyAssign::find()->all();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -99,7 +107,7 @@ class Company2Controller extends Controller
 	            'modelDevices'=>$modelDevices
             ]);
         }
-    }
+    }*/
 
     /**
      * Updates an existing company model.
@@ -107,7 +115,7 @@ class Company2Controller extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+/*    public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
@@ -118,7 +126,7 @@ class Company2Controller extends Controller
                 'model' => $model,
             ]);
         }
-    }
+    }*/
 
     /**
      * Deletes an existing company model.
@@ -148,4 +156,113 @@ class Company2Controller extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+
+	public function actionCreate()
+	{
+		$company = new Company;
+		$companyAssign = [new companyAssign];
+		if ($company->load(Yii::$app->request->post())) {
+
+			$companyAssign = dynamic_form::createMultiple(CompanyAssign::classname());
+			dynamic_form::loadMultiple($companyAssign, Yii::$app->request->post());
+
+			// ajax validation
+			/*
+			if (Yii::$app->request->isAjax) {
+				Yii::$app->response->format = Response::FORMAT_JSON;
+				return ArrayHelper::merge(
+					ActiveForm::validateMultiple($companyAssign),
+					ActiveForm::validate($companyAssign)
+				);
+			}
+			*/
+
+			$transaction = \Yii::$app->db->beginTransaction();
+			try {
+				if ($flag = $company->save()) {
+					foreach ($companyAssign as $ca) {
+						$ca->company_id = $company->id;
+						if (! ($flag = $ca->save())) {
+							$transaction->rollBack();
+							break;
+						}
+					}
+				}
+				if ($flag) {
+					$transaction->commit();
+					return $this->redirect(['view', 'id' => $company->id]);
+				}
+			} catch (\Exception $e) {
+				$transaction->rollBack();
+			}
+
+		}
+
+		return $this->render('create', [
+			'model' => $company,
+			'modelDevices'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
+//			'modelCompany' => $company,
+//			'modelsCompanyAssign' => (empty($companyAssign)) ? [new $companyAssign] : $companyAssign
+		]);
+	}
+
+	/**
+	 * Updates an existing Customer model.
+	 * If update is successful, the browser will be redirected to the 'view' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionUpdate($id)
+	{
+		$company = $this->findModel($id);
+		$companyAssign = $company->companyAssign;
+
+		if ($company ->load(Yii::$app->request->post())) {
+
+			$oldIDs = ArrayHelper::map($companyAssign, 'id', 'id');
+			$companyAssign = dynamic_form::createMultiple(CompanyAssign::classname(), $companyAssign );
+			dynamic_form::loadMultiple( $companyAssign, Yii::$app->request->post());
+			$deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($companyAssign, 'id', 'id')));
+			// ajax validation
+
+			/*if (Yii::$app->request->isAjax) {
+				Yii::$app->response->format = Response::FORMAT_JSON;
+				return ArrayHelper::merge(
+					ActiveForm::validateMultiple($modelsAddress),
+					ActiveForm::validate($modelCustomer)
+				);
+			}*/
+
+			// validate all models
+
+
+			$transaction = \Yii::$app->db->beginTransaction();
+			try {
+				if ($flag = $company->save()) {
+					if (! empty($deletedIDs)) {
+						CompanyAssign::deleteAll(['id' => $deletedIDs]);
+					}
+					foreach ($companyAssign as $ca) {
+						$ca->company_id = $company->id;
+						if (! ($flag = $ca->save())) {
+							$transaction->rollBack();
+							break;
+						}
+					}
+				}
+				if ($flag) {
+					$transaction->commit();
+					return $this->redirect(['view', 'id' => $company->id]);
+				}
+			} catch (\Exception $e) {
+				$transaction->rollBack();
+			}
+			}
+
+		return $this->render('update', [
+			'model' => $company,
+			'modelDevices'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
+		]);
+	}
 }
