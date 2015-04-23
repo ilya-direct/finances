@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\dynamic_form;
+use app\models\Service;
 use Yii;
 use app\models\company;
 use app\models\companyAssign;
@@ -162,6 +163,11 @@ class Company2Controller extends Controller
 	{
 		$company = new Company;
 		$companyAssign = [new companyAssign];
+		$services=Service::find()->all()->;
+		array_unshift($services,[0 => 'Выберете устройство']);
+
+		$devices=Device::find()->all();
+
 		if ($company->load(Yii::$app->request->post())) {
 
 			$companyAssign = dynamic_form::createMultiple(CompanyAssign::classname());
@@ -202,6 +208,8 @@ class Company2Controller extends Controller
 		return $this->render('create', [
 			'model' => $company,
 			'modelDevices'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
+			'services'=>$services,
+			'devices'=>$devices,
 //			'modelCompany' => $company,
 //			'modelsCompanyAssign' => (empty($companyAssign)) ? [new $companyAssign] : $companyAssign
 		]);
