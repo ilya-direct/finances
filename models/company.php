@@ -48,7 +48,7 @@ class Company extends \yii\db\ActiveRecord
 	    $value = $this->$attribute;
 
 	    if (!preg_match('/mac/',$value)) {
-		    $this->addError($attribute, "((((");
+		   // $this->addError($attribute, "((((");
 	    }
 	}
 

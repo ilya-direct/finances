@@ -62,11 +62,11 @@ use wbraganca\dynamicform\DynamicFormWidget;
 							}
 							?>
 							<div class="row">
-								<div class="col-sm-6">
-									<?= $form->field($modelDevice, "[{$i}]service_id")->dropDownList($services) ?>
+								<div class="col-sm-8">
+									<?= $form->field($modelDevice, "[{$i}]service_id")->dropDownList($services,['prompt'=>'Выберете услугу']) ?>
 								</div>
-								<div class="col-sm-7">
-									<?= $form->field($modelDevice, "[{$i}]device_id")->dropDownList($devices) ?>
+								<div class="col-sm-6">
+									<?= $form->field($modelDevice, "[{$i}]device_id")->dropDownList($devices,['prompt'=>'Выберете устройство']) ?>
 								</div>
 								<div class="col-sm-6">
 									<?= $form->field($modelDevice, "[{$i}]price")->textInput(['maxlength' => true]) ?>

@@ -163,10 +163,10 @@ class Company2Controller extends Controller
 	{
 		$company = new Company;
 		$companyAssign = [new companyAssign];
-		$services=Service::find()->all()->;
-		array_unshift($services,[0 => 'Выберете устройство']);
-
-		$devices=Device::find()->all();
+		$services=ArrayHelper::map(Service::find()->all(),'id','name');
+		ksort($services);
+		$devices=ArrayHelper::map(Device::find()->all(),'id','name');
+		ksort($devices);
 
 		if ($company->load(Yii::$app->request->post())) {
 
@@ -225,6 +225,10 @@ class Company2Controller extends Controller
 	{
 		$company = $this->findModel($id);
 		$companyAssign = $company->companyAssign;
+		$services=ArrayHelper::map(Service::find()->all(),'id','name');
+		ksort($services);
+		$devices=ArrayHelper::map(Device::find()->all(),'id','name');
+		ksort($devices);
 
 		if ($company ->load(Yii::$app->request->post())) {
 
@@ -233,15 +237,6 @@ class Company2Controller extends Controller
 			dynamic_form::loadMultiple( $companyAssign, Yii::$app->request->post());
 			$deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($companyAssign, 'id', 'id')));
 			// ajax validation
-
-			/*if (Yii::$app->request->isAjax) {
-				Yii::$app->response->format = Response::FORMAT_JSON;
-				return ArrayHelper::merge(
-					ActiveForm::validateMultiple($modelsAddress),
-					ActiveForm::validate($modelCustomer)
-				);
-			}*/
-
 			// validate all models
 
 
@@ -271,6 +266,8 @@ class Company2Controller extends Controller
 		return $this->render('update', [
 			'model' => $company,
 			'modelDevices'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
+			'services'=>$services,
+			'devices'=>$devices
 		]);
 	}
 }
