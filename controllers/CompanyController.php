@@ -39,7 +39,7 @@ class CompanyController extends Controller{
 	    //$dataReader=$command->queryAll();
 	    //$dataReader=$command->execute();
 	    //$dataReader=$command->queryColumn();
-
+	    /*
 	    $company=Company::findOne(43);
 	    $company=is_object($company) ? $company : new company();
 	    $company->name='HelloApple2';
@@ -50,6 +50,17 @@ class CompanyController extends Controller{
 	    if(!$company->save()){
 		    var_dump($company->getErrors('comment'));
 	    }
+	    */
+
+	    $company=Company::findOne(1);
+	    $companyAssigns=$company->companyAssign;
+	  //  var_dump($companyAssigns);
+	    $service_group=array();
+	    foreach($companyAssigns as $ca){
+		    if(!isset($service_group[$ca->service_id])) $service_group[$ca->service_id]=array();
+		    $service_group[$ca->service_id][]=$ca;
+	    }
+	    var_dump($service_group);
 	    return;
 
         return $this->render('index',['companies'=>$companies]);

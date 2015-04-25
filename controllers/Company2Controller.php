@@ -264,8 +264,8 @@ class Company2Controller extends Controller
 			}
 
 		return $this->render('update', [
-			'model' => $company,
-			'modelDevices'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
+			'company' => $company,
+			'companyAssign'=>$companyAssign,
 			'services'=>$services,
 			'devices'=>$devices
 		]);

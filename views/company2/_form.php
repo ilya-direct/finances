@@ -5,8 +5,8 @@ use yii\widgets\ActiveForm;
 use wbraganca\dynamicform\DynamicFormWidget;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\company */
-/* @var $modelDevices app\models\device */
+/* @var $company app\models\company */
+/* @var $companyAssign app\models\device */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -16,10 +16,10 @@ use wbraganca\dynamicform\DynamicFormWidget;
 	<?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
 	<div class="row">
 		<div class="col-sm-6">
-			<?= $form->field($model, 'name')->textInput(['maxlength' => 65]) ?>
+			<?= $form->field($company, 'name')->textInput(['maxlength' => 65]) ?>
 		</div>
 		<div class="col-sm-6">
-			<?= $form->field($model, 'link')->textInput(['maxlength' => 45]) ?>
+			<?= $form->field($company, 'link')->textInput(['maxlength' => 45]) ?>
 		</div>
 	</div>
 
@@ -34,7 +34,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 				'min' => 1, // 0 or 1 (default 1)
 				'insertButton' => '.add-item', // css class
 				'deleteButton' => '.remove-item', // css class
-				'model' => $modelDevices[0],
+				'model' => $companyAssign[0],
 				'formId' => 'dynamic-form',
 				'formFields' => [
 					'price',
@@ -44,7 +44,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 			]); ?>
 
 			<div class="container-items"><!-- widgetContainer -->
-				<?php foreach ($modelDevices as $i => $modelDevice): ?>
+				<?php foreach ($companyAssign as $i => $ca): ?>
 					<div class="item panel panel-default"><!-- widgetBody -->
 						<div class="panel-heading">
 							<h3 class="panel-title pull-left">Услуга</h3>
@@ -57,19 +57,19 @@ use wbraganca\dynamicform\DynamicFormWidget;
 						<div class="panel-body">
 							<?php
 							// necessary for update action.
-							if (! $modelDevice->isNewRecord) {
-								echo Html::activeHiddenInput($modelDevice, "[{$i}]id");
+							if (! $ca->isNewRecord) {
+								echo Html::activeHiddenInput($ca, "[{$i}]id");
 							}
 							?>
 							<div class="row">
 								<div class="col-sm-8">
-									<?= $form->field($modelDevice, "[{$i}]service_id")->dropDownList($services,['prompt'=>'Выберете услугу']) ?>
+									<?= $form->field($ca, "[{$i}]service_id")->dropDownList($services,['prompt'=>'Выберете услугу']) ?>
 								</div>
 								<div class="col-sm-6">
-									<?= $form->field($modelDevice, "[{$i}]device_id")->dropDownList($devices,['prompt'=>'Выберете устройство']) ?>
+									<?= $form->field($ca, "[{$i}]device_id")->dropDownList($devices,['prompt'=>'Выберете устройство']) ?>
 								</div>
 								<div class="col-sm-6">
-									<?= $form->field($modelDevice, "[{$i}]price")->textInput(['maxlength' => true]) ?>
+									<?= $form->field($ca, "[{$i}]price")->textInput(['maxlength' => true]) ?>
 								</div>
 							</div>
 						</div>
@@ -81,7 +81,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+		<?= Html::submitButton($company->isNewRecord ? 'Create' : 'Update', ['class' => $company->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

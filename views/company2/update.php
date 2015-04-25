@@ -5,9 +5,9 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\company */
 
-$this->title = 'Update Company: ' . ' ' . $model->name;
+$this->title = 'Update Company: ' . ' ' . $company->name;
 $this->params['breadcrumbs'][] = ['label' => 'Companies', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $company->name, 'url' => ['view', 'id' => $company->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="company-update">
@@ -15,8 +15,9 @@ $this->params['breadcrumbs'][] = 'Update';
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
-        'model' => $model,
-	    'modelDevices'=> $modelDevices,
+        'company' => $company,
+	    'companyAssign'=>$companyAssign,
+	   // 'service_group'=> $service_group,
 	    'services'=>$services,
 	    'devices'=>$devices
     ]) ?>
