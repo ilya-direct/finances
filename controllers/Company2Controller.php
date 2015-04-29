@@ -27,16 +27,6 @@ class Company2Controller extends Controller
     public function behaviors()
     {
         return [
-/*	        'access' =>[
-		        'class' => AccessControl::classname(),
-		        'only'=>['create','update'],
-		        'rules'=>
-			        [
-				         'allow' => true,
-				        'action'=>['index'],
-                        'roles' => ['demo'],
-			        ],
-		        ],*/
 	        'access' => [
 		        'class' => AccessControl::className(),
 		        //'only' => ['index','update','create'],
@@ -89,52 +79,6 @@ class Company2Controller extends Controller
         ]);
     }
 
-    /**
-     * Creates a new company model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-
-  /*  public function actionCreate()
-    {
-        $model = new company();
-        $modelDevices =companyAssign::find()->all();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-	            'modelDevices'=>$modelDevices
-            ]);
-        }
-    }*/
-
-    /**
-     * Updates an existing company model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-/*    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
-    }*/
-
-    /**
-     * Deletes an existing company model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
@@ -163,26 +107,13 @@ class Company2Controller extends Controller
 	{
 		$company = new Company;
 		$companyAssign = [new companyAssign];
-		$services=ArrayHelper::map(Service::find()->all(),'id','name');
-		ksort($services);
-		$devices=ArrayHelper::map(Device::find()->all(),'id','name');
-		ksort($devices);
+		$services=ArrayHelper::map(Service::find()->orderBy('name')->all(),'id','name');
+		$devices= ArrayHelper::map(Device::find()->orderBy('name')->all(),'id','name');
 
 		if ($company->load(Yii::$app->request->post())) {
 
 			$companyAssign = dynamic_form::createMultiple(CompanyAssign::classname());
 			dynamic_form::loadMultiple($companyAssign, Yii::$app->request->post());
-
-			// ajax validation
-			/*
-			if (Yii::$app->request->isAjax) {
-				Yii::$app->response->format = Response::FORMAT_JSON;
-				return ArrayHelper::merge(
-					ActiveForm::validateMultiple($companyAssign),
-					ActiveForm::validate($companyAssign)
-				);
-			}
-			*/
 
 			$transaction = \Yii::$app->db->beginTransaction();
 			try {
@@ -206,29 +137,19 @@ class Company2Controller extends Controller
 		}
 
 		return $this->render('create', [
-			'model' => $company,
-			'modelDevices'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
+			'company' => $company,
+			'companyAssign'=> (empty($companyAssign)) ? [new $companyAssign] : $companyAssign,
 			'services'=>$services,
 			'devices'=>$devices,
-//			'modelCompany' => $company,
-//			'modelsCompanyAssign' => (empty($companyAssign)) ? [new $companyAssign] : $companyAssign
 		]);
 	}
 
-	/**
-	 * Updates an existing Customer model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id
-	 * @return mixed
-	 */
 	public function actionUpdate($id)
 	{
 		$company = $this->findModel($id);
 		$companyAssign = $company->companyAssign;
-		$services=ArrayHelper::map(Service::find()->all(),'id','name');
-		ksort($services);
-		$devices=ArrayHelper::map(Device::find()->all(),'id','name');
-		ksort($devices);
+		$services=ArrayHelper::map(Service::find()->orderBy('name')->all(),'id','name');
+		$devices=ArrayHelper::map(Device::find()->orderBy('name')->all(),'id','name');
 
 		if ($company ->load(Yii::$app->request->post())) {
 
@@ -236,10 +157,6 @@ class Company2Controller extends Controller
 			$companyAssign = dynamic_form::createMultiple(CompanyAssign::classname(), $companyAssign );
 			dynamic_form::loadMultiple( $companyAssign, Yii::$app->request->post());
 			$deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($companyAssign, 'id', 'id')));
-			// ajax validation
-			// validate all models
-
-
 			$transaction = \Yii::$app->db->beginTransaction();
 			try {
 				if ($flag = $company->save()) {
@@ -261,7 +178,7 @@ class Company2Controller extends Controller
 			} catch (\Exception $e) {
 				$transaction->rollBack();
 			}
-			}
+		}
 
 		return $this->render('update', [
 			'company' => $company,
