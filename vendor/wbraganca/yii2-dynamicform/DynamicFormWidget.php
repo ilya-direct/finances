@@ -181,7 +181,16 @@ class DynamicFormWidget extends \yii\base\Widget
         $crawler->addHTMLContent($content, \Yii::$app->charset);
         $results = $crawler->filter($this->widgetItem);
         $document = new \DOMDocument('1.0', \Yii::$app->charset);
-        $document->appendChild($document->importNode($results->first()->getNode(0), true));
+	    $html=$results->first()->getNode(0);
+
+	    for($j=0; $j<2;$j++){
+		    $html->getElementsByTagName('select')->item($j)->getElementsByTagName('option')->item(0)->setAttribute('selected','');
+		    $length=$html->getElementsByTagName('select')->item($j)->getElementsByTagName('option')->length;
+		    for($i=1; $i<$length; $i++){
+			    $html->getElementsByTagName('select')->item($j)->getElementsByTagName('option')->item($i)->removeAttribute('selected');
+		    }
+	    }
+        $document->appendChild($document->importNode($html, true));
         $this->_options['template'] = trim($document->saveHTML());
 
         if (isset($this->_options['min']) && $this->_options['min'] === 0 && $this->model->isNewRecord) {
