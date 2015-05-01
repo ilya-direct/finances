@@ -2,12 +2,12 @@
 
 namespace app\controllers;
 
-use app\models\dynamic_form;
+use app\models\Dynamic_form;
 use app\models\Service;
 use Yii;
-use app\models\company;
-use app\models\companyAssign;
-use app\models\device;
+use app\models\Company;
+use app\models\CompanyAssign;
+use app\models\Device;
 use app\models\Model;
 use app\models\Company2Search;
 use yii\filters\AccessControl;
