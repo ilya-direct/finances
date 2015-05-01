@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\company */
 
-$this->title = 'Изменить данные компании : ' . ' ' . $company->name;
+$this->title = 'Изменение данных компании : ' . ' ' . $company->name;
 $this->params['breadcrumbs'][] = ['label' => 'Список компаний', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $company->name, 'url' => ['view', 'id' => $company->id]];
 $this->params['breadcrumbs'][] = 'Изменить';

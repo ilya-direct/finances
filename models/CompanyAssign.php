@@ -40,11 +40,10 @@ class CompanyAssign extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'price' => 'Price',
-            'company_id' => 'Company ID',
-            'device_id' => 'Device ID',
-            'service_id' => 'Service ID',
+            'price' => 'Цена',
+            'company_id' => 'Компания',
+            'device_id' => 'Устройство',
+            'service_id' => 'Услуга',
         ];
     }
 

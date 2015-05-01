@@ -33,7 +33,7 @@ class Company2Controller extends Controller
 		        'rules' => [
 			        [
 				        'allow' => true,
-				        'actions' => ['index','create','update','view'],
+				        'actions' => ['index','create','update','view','delete'],
 				        'roles' => ['@'],
 			        ],
 			        [
