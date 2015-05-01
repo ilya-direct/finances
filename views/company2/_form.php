@@ -24,7 +24,9 @@ use wbraganca\dynamicform\DynamicFormWidget;
 	</div>
 
 	<div class="panel panel-default">
+		<div class="panel-heading">Услуги</div>
 		<div class="panel-body">
+
 			<?php DynamicFormWidget::begin([
 				'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
 				'widgetBody' => '.container-items', // required: css class selector
@@ -44,16 +46,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 
 			<div class="container-items"><!-- widgetContainer -->
 				<?php foreach ($companyAssign as $i => $ca): ?>
-					<div class="item panel panel-default"><!-- widgetBody -->
-						<div class="panel-heading">
-							<h3 class="panel-title pull-left">Услуга</h3>
-							<div class="pull-right">
-								<button type="button" class="add-item btn btn-success btn-xs"><i class="glyphicon glyphicon-plus"></i></button>
-								<button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-						<div class="panel-body">
+					<div class="item"><!-- widgetBody -->
 							<?php
 							// necessary for update action.
 							if (! $ca->isNewRecord) {
@@ -61,23 +54,26 @@ use wbraganca\dynamicform\DynamicFormWidget;
 							}
 							?>
 							<div class="row">
-								<div class="col-sm-8">
-									<?= $form->field($ca, "[{$i}]service_id")->dropDownList($services,['prompt'=>'Выберете услугу']) ?>
+								<div class="col-sm-4">
+									<?= $form->field($ca, "[{$i}]service_id")->label(false)->dropDownList($services,['prompt'=>'Выберете услугу']) ?>
 								</div>
-								<div class="col-sm-6">
-									<?= $form->field($ca, "[{$i}]device_id")->dropDownList($devices,['prompt'=>'Выберете устройство']) ?>
+								<div class="col-sm-4">
+									<?= $form->field($ca, "[{$i}]device_id")->label(false)->dropDownList($devices,['prompt'=>'Выберете устройство']) ?>
 								</div>
-								<div class="col-sm-6">
-									<?= $form->field($ca, "[{$i}]price")->textInput(['maxlength' => true]) ?>
+								<div class="col-sm-3">
+									<?= $form->field($ca, "[{$i}]price")->label(false)->textInput(['maxlength' => true]) ?>
+								</div>
+								<div class="col-sm-1">
+									<button type="button" class="add-item btn btn-success btn-xs"><i class="glyphicon glyphicon-plus"></i></button>
+									<button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
 								</div>
 							</div>
-						</div>
 					</div>
 				<?php endforeach; ?>
 			</div>
 			<?php DynamicFormWidget::end(); ?>
+			</div>
 		</div>
-	</div>
 
 	<div class="form-group">
 		<?= Html::submitButton($company->isNewRecord ? 'Create' : 'Update', ['class' => $company->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
