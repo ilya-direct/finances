@@ -74,7 +74,7 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
-
+/*
     public function actionContact()
     {
         $model = new ContactForm();
@@ -88,6 +88,7 @@ class SiteController extends Controller
             ]);
         }
     }
+*/
 
     public function actionAbout()
     {

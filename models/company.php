@@ -34,8 +34,8 @@ class Company extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['timecreated'], 'safe'],
-            [['name', 'link'], 'string','min'=>4, 'max' => 65],
-            [['advantage', 'disadvantage', 'comment', 'backtrace'], 'string', 'max' => 100],
+            [['name', 'link'], 'string','min'=>4, 'max' => 70],
+            [['advantage', 'disadvantage', 'comment', 'backtrace'], 'string', 'max' => 255],
             [['name'], 'unique'],
 	        ['advantage','default', 'value' => null],
 	        ['comment','validateComment','skipOnEmpty'=>true],
@@ -58,14 +58,14 @@ class Company extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'name' => 'company_name',
-            'link' => 'Link',
-            'advantage' => 'Advantage',
-            'disadvantage' => 'Disadvantage',
-            'timecreated' => 'Timecreated',
-            'comment' => 'Comment',
-            'backtrace' => 'Backtrace',
+            'id' => 'id',
+            'name' => 'Имя компании',
+            'link' => 'Ссылка',
+            'advantage' => 'Преимущества',
+            'disadvantage' => 'Недостатки',
+            'timecreated' => 'Время создания',
+            'comment' => 'Комментарий',
+            'backtrace' => 'Как нашёл',
         ];
     }
 

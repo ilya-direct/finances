@@ -15,11 +15,20 @@ use wbraganca\dynamicform\DynamicFormWidget;
 <div class="company-form">
 	<?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
 	<div class="row">
-		<div class="col-sm-6">
-			<?= $form->field($company, 'name')->textInput(['maxlength' => 65]) ?>
+		<div class="col-sm-12">
+			<?= $form->field($company, 'name')->textInput(['maxlength' => 70]) ?>
 		</div>
-		<div class="col-sm-6">
-			<?= $form->field($company, 'link')->textInput(['maxlength' => 45]) ?>
+		<div class="col-sm-12">
+			<?= $form->field($company, 'link')->textInput(['maxlength' => 70]) ?>
+		</div>
+		<div class="col-sm-12">
+			<?= $form->field($company, 'backtrace')->textInput(['maxlength' => 100]) ?>
+		</div>
+		<div class="col-sm-12">
+			<?= $form->field($company, 'advantage')->textArea(['maxlength' => 250]) ?>
+		</div>
+		<div class="col-sm-12">
+			<?= $form->field($company, 'disadvantage')->textArea(['maxlength' => 250]) ?>
 		</div>
 	</div>
 
@@ -75,8 +84,14 @@ use wbraganca\dynamicform\DynamicFormWidget;
 			</div>
 		</div>
 
+	<div class="row">
+		<div class="col-sm-12">
+			<?= $form->field($company, 'comment')->textArea(['maxlength' => 250]) ?>
+		</div>
+	</div>
+
 	<div class="form-group">
-		<?= Html::submitButton($company->isNewRecord ? 'Create' : 'Update', ['class' => $company->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+		<?= Html::submitButton($company->isNewRecord ? 'Создать компанию' : 'Обновить компанию', ['class' => $company->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
