@@ -3,7 +3,7 @@ namespace app\commands;
 
 use yii;
 use yii\console\Controller;
-use app\models\Service;
+use app\models\CompanyDB\Service;
 use yii\helpers\ArrayHelper;
 
 class ShopController extends Controller

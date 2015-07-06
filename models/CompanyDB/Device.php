@@ -1,23 +1,22 @@
 <?php
 
-namespace app\models;
-
-use Yii;
+namespace app\models\CompanyDB;
 
 /**
- * This is the model class for table "service".
+ * This is the model class for table "device".
  *
  * @property integer $id
  * @property string $name
+ * @property integer $type
  */
-class Service extends \yii\db\ActiveRecord
+class Device extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'service';
+        return 'device';
     }
 
     /**
@@ -27,6 +26,7 @@ class Service extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['type'], 'integer'],
             [['name'], 'string', 'max' => 65],
             [['name'], 'unique']
         ];
@@ -40,20 +40,11 @@ class Service extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'type' => 'Type',
         ];
     }
 
 	public function getCompanyAssign(){
-		return $this->hasMany(CompanyAssign::className(), ['id' => 'service_id']);
-	}
-
-	public static function getColumns($tablevar='s'){
-		$params=[];
-		$tablename=self::tableName();
-		$colums=['id','name'];
-		foreach($colums as $col){
-			$params[$tablename.'_'.$col]=$tablevar.'.'.$col;
-		}
-		return $params;
+		return $this->hasMany(CompanyAssign::className(), ['id' => 'device_id']);
 	}
 }

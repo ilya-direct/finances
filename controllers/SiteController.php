@@ -1,13 +1,11 @@
 <?php
 
 namespace app\controllers;
-
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
+use app\models\Site\LoginForm;
 
 class SiteController extends Controller
 {
@@ -94,15 +92,4 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
-
-    public function actionUser(){
-        $model= new \app\models\UserForm();
-
-        if($model->load(Yii::$app->request->post()) && $model->validate()){
-            Yii::$app->session->setFlash('success','You have entered the correct info');
-        }
-
-        return $this->render('UserForm',['model'=>$model]);
-    }
-
 }

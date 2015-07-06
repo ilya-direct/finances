@@ -36,7 +36,7 @@ AppAsset::register($this);
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
 	                Yii::$app->user->isGuest ?
-		            ['label' => 'Добро пожаловать'] : ['label' => 'Список компаний', 'url' => ['/company2/index']],
+		            ['label' => 'Добро пожаловать'] : ['label' => 'Список компаний', 'url' => ['/company/index']],
                     ['label' => 'О сайте', 'url' => ['/site/about']],
                    // ['label' => 'Задайте вопрос', 'url' => ['/site/contact']],
                     Yii::$app->user->isGuest ?

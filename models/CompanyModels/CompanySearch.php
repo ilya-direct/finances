@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\models\CompanyModels;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Company;
+use app\models\CompanyDB\Company;
 
 /**
- * Company2Search represents the model behind the search form about `app\models\company`.
+ * CompanySearch represents the model behind the search form about `app\models\CompanyDB\Company`.
  */
-class Company2Search extends Company
+class CompanySearch extends Company
 {
     /**
      * @inheritdoc
