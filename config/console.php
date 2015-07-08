@@ -1,6 +1,7 @@
 <?php
 
-Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
+Yii::setAlias('@tests', dirname(__DIR__) . DIRECTORY_SEPARATOR .'tests');
+Yii::setAlias('@data', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'data');
 
 $params = require(__DIR__ . '/params.php');
 $db = require(__DIR__ . '/db.php');
