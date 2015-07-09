@@ -1706,7 +1706,11 @@ class PHPExcel_Calculation {
 				'ZTEST'					=> array('category'			=>	PHPExcel_Calculation_Function::CATEGORY_STATISTICAL,
 												 'functionCall'		=>	'PHPExcel_Calculation_Statistical::ZTEST',
 												 'argumentCount'	=>	'2-3'
-												)
+												),
+				'COUNTPARTS'			=> array('category'			=>	PHPExcel_Calculation_Function::CATEGORY_MATH_AND_TRIG,
+												'functionCall'		=>	'PHPExcel_Calculation_MathTrig::COUNTPARTS',
+												'argumentCount'	=>	'1'
+												),
 			);
 
 

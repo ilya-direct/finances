@@ -93,7 +93,7 @@ class WalletController extends \yii\console\Controller
 				$objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
 				$objWriter->setDelimiter(";");
 				$objWriter->setEnclosure("");
-				$objWriter->setPreCalculateFormulas(false);
+//				$objWriter->setPreCalculateFormulas(false);
 				$output_filepath=$output_path.'/'.$file_name.'.csv';
 				$objWriter->save($output_filepath);
 				$rec->csv_converted=1;
