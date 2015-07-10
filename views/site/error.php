@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $message string */
 /* @var $exception Exception */
 
-$this->title = $name;
+$this->title = $exception->statusCode;
 ?>
 <div class="site-error">
 
@@ -18,10 +18,10 @@ $this->title = $name;
     </div>
 
     <p>
-        The above error occurred while the Web server was processing your request.
+        Мы уже знаем, о данной ошибке! Исправим в ближайшее время!
     </p>
-    <p>
-        Please contact us if you think this is a server error. Thank you.
-    </p>
+	<p>
+		По всем вопросам обращайтесь по телефону 8-963-656-83-77
+	</p>
 
 </div>
