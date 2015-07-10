@@ -204,6 +204,7 @@ class CompanyController extends Controller
 			->leftjoin('device s', 'ca.service_id=s.id');
 		$companies=$query->all();
 		/*
+		 * //				DB\TransactionCategory::find()->where(['value'=>$headers[$i]])->exists()
 				$subQuery = (new \yii\db\Query())->select('name')->from('company')->where('id=ca.company_id');
 
 				$query=(new \yii\db\Query())
