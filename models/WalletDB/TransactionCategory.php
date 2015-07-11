@@ -51,4 +51,10 @@ class TransactionCategory extends \yii\db\ActiveRecord
             'sign' => 'Sign',
         ];
     }
+
+
+	public function getRecords()
+	{
+		return $this->hasMany(Record::className(), ['tcategory' => 'id']);
+	}
 }

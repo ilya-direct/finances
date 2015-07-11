@@ -58,4 +58,12 @@ class DbxFinance extends \yii\db\ActiveRecord
             'in_db' => 'In Db',
         ];
     }
+
+	public function getMonthStr(){
+		return str_replace(' ','0',\sprintf('%2.d', $this->month));
+	}
+
+	public function setMonthStr($value){
+		$this->month=(int) $value;
+	}
 }

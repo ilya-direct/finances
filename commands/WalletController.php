@@ -12,7 +12,7 @@ class WalletController extends \yii\console\Controller
 	    $DIR=dirname(__FILE__);
 	    $token='OprJKfb4QroAAAAAAAAFZw2tIxGlGCVvvqWn-58KmhEhazh_vSdUvUtpJ_JBTZDS';
 	    $client=new  dbx\Client($token,'directapp','UTF-8');
-	    $objPHPExcel = \PHPExcel_IOFactory::load($DIR. '/2014.10.xlsm');
+	    $objPHPExcel = \PHPExcel_IOFactory::load($DIR. '/ssss');
 	    $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, false, true, true);
 	    //$finances=$client->getMetadataWithChildren('/finances')['contents'];
 	    //x();
@@ -40,7 +40,7 @@ class WalletController extends \yii\console\Controller
 		    return $el;
 	    },$finances);
 
-	    $recs=DB\DbxFinance::find()->all();
+	    $recs=DB\DbxFinance::find()->orderBy('year ASC, month ASC')->all();
 	    // --- функция поиска
 	    function search_info($pattern,$finances){
 		    foreach($finances as $fin){
@@ -52,10 +52,7 @@ class WalletController extends \yii\console\Controller
 	    };
 	    // ---
 	    foreach( $recs as $rec){
-
-		    //TODO: убрать строку ниже, добавить её в AR форматный вывод поля
-		    $rec->month=str_replace(' ','0',\sprintf('%2.d', $rec->month));
-		    $yearmonth=$rec->year.'.'.$rec->month;
+		    $yearmonth=$rec->year.'.'.$rec->monthStr;
 		    //TODO: решить проблему с API и убрать функцию SEARCH_INFO
 		    $info=search_info($yearmonth,$finances);
 		    if(!$info) throw new \Exception('not found file '. $yearmonth);
@@ -88,17 +85,16 @@ class WalletController extends \yii\console\Controller
 			throw new \Exception('can\'t create output directory');
 
 
-		$recs=DB\DbxFinance::findAll(['exists'=>1,'csv_converted'=>0]);
+		$recs=DB\DbxFinance::find()->where(['exists'=>1,'csv_converted'=>0])->orderBy('year ASC, month ASC')->all();
 		foreach($recs as $rec){
-			//TODO: убрать строку ниже, добавить её в AR форматный вывод поля
-			$rec->month=str_replace(' ','0',\sprintf('%2.d', $rec->month));
-			$file_name=$rec->year.'.'.$rec->month;
+			$file_name=$rec->year.'.'.$rec->monthStr;
 			$input_filepath=$input_path.'/'.$file_name.'.xlsm';
 			if(file_exists($input_filepath)){
 				$objPHPExcel = \PHPExcel_IOFactory::load($input_filepath);
 				$objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
 				$objWriter->setDelimiter(";");
 				$objWriter->setEnclosure("");
+				$objPHPExcel->getActiveSheet()->getStyle('C:C')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 //				$objWriter->setPreCalculateFormulas(false);
 				$output_filepath=$output_path.'/'.$file_name.'.csv';
 				$objWriter->save($output_filepath);
@@ -111,133 +107,11 @@ class WalletController extends \yii\console\Controller
 	}
 
 	public function actionCsv2db(){
-		$input_path=Yii::getAlias('@finance_csv');
-		if(!is_dir($input_path))
-			throw new \Exception('can\'t find input directory in csv2db.php');
-
-		$recs=DB\DbxFinance::findAll(['exists'=>1,'csv_converted'=>1,'in_db'=>0]);
-
-		foreach($recs as $rec){
-			//TODO: убрать строку ниже, добавить её в AR форматный вывод поля
-			$rec->month=str_replace(' ','0',\sprintf('%2.d', $rec->month));
-			$yearmonth=$rec->year.'.'.$rec->month;
-			$input_filepath=$input_path.'/'.$yearmonth.'.csv';
-			if(!file_exists($input_filepath))
-				throw new \Exception("file $input_filepath not found");
-
-			$file_handle=fopen($input_filepath,'r');
-			if(!$file_handle)
-				throw new \Exception("Не удалось открыть файл $input_filepath!");
-
-			$headers_1=get_table_headers($file_handle,"ТС по расчету");
-			if ($headers_1===false)
-				throw new \Exception("Строка с корректировкой баланса не найдена $yearmonth");
-			fix_headers($headers_1);
-
-			$headers_2=get_table_headers($file_handle,"Дата");
-			if ($headers_2===false)
-				throw new \Exception("Строка с основными заголовком не найдена $yearmonth");
-			fix_headers($headers_2);
-
-			$headers=merge_headers($headers_1,$headers_2);
-			unset($headers_1); unset($headers_2);
-
-			$date_index=array_search('date',$headers);
-			if ($date_index===false)
-				throw new \Exception('В заголовках нет даты '.$yearmonth);
-
-			$maxday=date('d',mktime(0,0,0,((int)$rec->month)+1,0,$rec->year));
-
-			for($current_day=1;$current_day<=$maxday;$current_day++){
-				$data=fgetcsv($file_handle,null,';');
-				$date=$data[$date_index];
-				if(!preg_match('/^([\d]{2})\.([\d]{2})\.([\d]{4})$/',$date,$matches) or
-					$matches[1]!=$current_day || $matches[2]!=$rec->month || $matches[3]!=$rec->year) {
-					throw new \Exception('Дата '.$date.' не совпадает с ожидаемой в файле '.$input_filepath);
-				}
-				$date="{$rec->year}.{$rec->month}.{$current_day}";
-				array_to_utf8($data);
-				for($i=0;$i<count($headers);$i++){
-					if ($headers[$i]===false) continue;
-					$data[$i]=trim($data[$i]);
-					$header_parts=explode('_',$headers[$i]);
-					if (count($header_parts)==1){
-						if($headers[$i]=='realmoney'){
-							if(empty($data[$i])){
-								DB\TransactionCategory::deleteAll(['date'=>$date]);
-							}else{
-								$balance_check=DB\BalanceCheck::findOne(['date'=>$date]);
-								$balance_check=is_object($balance_check) ? $balance_check : new DB\BalanceCheck();
-								$balance_check->attributes([
-									'date'=>$date,
-									'consider'=>$data[array_search('countmoney',$headers)],
-									'realmoney'=>$data[$i],
-									'diff'=>$data[array_search('difference',$headers)]
-								]);
-								$balance_check->save();
-								unset($balance_check);
-							}
-						}
-						continue;
-					}
-					if(empty($data[$i])){
-						DB\TransactionCategory::deleteAll(['date'=>$date,'transaction_category'=>$headers[$i]]);
-						continue;
-					}
-					$sign=$header_parts[0];
-					if(count($header_parts)===2){
-						insert_transaction_single($date,$headers[$i],$data[$i]);
-					}elseif(count($header_parts)===3 && $header_parts[2]=='multiple'){
-						$coins=explode('|',$data[$i]);
-						$coins_desc=explode('|',$data[$i+1]);
-						if (count($coins)!=count($coins_desc))
-							throw new Exception("Неверная запись {$date} : {$data[$i]} {$data[$i+1]} ");
-						$entries=array();
-						for($j=0;$j<count($coins);$j++){
-							$entry=new stdClass();
-							$coins_desc[$j]=trim($coins_desc[$j]);
-							if(empty($coins_desc[$j]))
-								throw new Exception("Нет описания $date {$data[$i]} {$data[$i+1]}");
-							$entry->sum=$coins[$j];
-							$entry->item=$coins_desc[$j];
-							$entries[]=clone $entry;
-						}
-						insert_transaction_multiple($date,$headers[$i],$entries);
-						unset($entry); unset($entries);
-					}
-				}
-			}
-			$flags=[
-				0b00001=>'Корректировка',
-				0b00010=>'Всего получено',
-				0b00100=>'Всего потрачено',
-				0b01000=>'Стартовый капитал',
-				0b10000=>'Конечный капитал'
-			];
-			$total_flag= 0b00000;
-			while(($data=fgetcsv($file_handle,null,';'))!==false){
-				to_utf8($data[$date_index]);
-				if(in_array($data[$date_index],$flags)){
-					$total_flag=$total_flag | array_search($data[$date_index],$flags);
-					$max_date="$rec->year.$rec->month.$maxday";
-					if($data[$date_index]==$flags[0b00001] && $DB->record_exists('balance_check',array('date'=>$max_date)))
-						insert_transaction_single($max_date,'correcting',$data[$date_index+1],true);
-				}
-			}
-			if (!($total_flag & 0b00001))
-				throw new Exception('Отсутствуют данные о корректировке '."$rec->year-$rec->month-$maxday");
-
-			fclose($file_handle);
-			echo "file $yearmonth imported to db \n";
-			$DB->set_field('dbx_finance','in_db',1,array('id'=>$rec->id));
-		}
-		delete_items_without_rec();
-
 		function get_table_headers(&$handle,$needle){
 			if (empty($needle)) return false;
 			while(($data=fgetcsv($handle,null,';'))!==false){
 				foreach($data as $cell){
-					to_utf8($cell);
+					//to_utf8($cell);
 					if ($cell===$needle){
 						return $data;
 					}
@@ -248,8 +122,10 @@ class WalletController extends \yii\console\Controller
 
 		function fix_headers(array &$headers){
 			for($i=0; $i<count($headers); $i++){
-				$field_name=DB\TransactionCategory::find()->select('name')->where(['value'=>$headers[$i]])->one();
-				if(!empty($field_name)){
+				// TODO: оптимизировать (выборка одного поля из DB с возвращением строкой или null)
+				$field_name=(DB\TransactionCategory::find()->select('name')->where(['value'=>$headers[$i]])->one());
+				if(!is_null($field_name)){
+					$field_name=$field_name->name;
 					$field_array=explode('_',$field_name);
 					if(count($field_array)<=2){
 						$headers[$i]=$field_name;
@@ -276,18 +152,13 @@ class WalletController extends \yii\console\Controller
 			}
 
 		}
-
+		/*
 		function to_utf8(&$str){
 			$encoding=mb_detect_encoding($str);
 			if($encoding=="UTF-8") return;
 			iconv( $encoding,'UTF-8',$str);
 		}
-
-		function array_to_utf8(array &$arr){
-			foreach($arr as &$item){
-				to_utf8($item);
-			}
-		}
+		*/
 		function merge_headers($h1,$h2){
 			global $yearmonth;
 			$n=(count($h1)>count($h2)) ? count($h1) : count($h2);
@@ -307,11 +178,137 @@ class WalletController extends \yii\console\Controller
 			}
 			return $result;
 		}
-		function delete_items_without_rec(){
-			Global $DB;
-			$ids=$DB->get_fieldset_sql('select distinct itemid from record');
-			if(!empty($ids))
-				$DB->delete_record_sql('delete from item where id not in ('.implode(',',$ids).')');
+		// -- НАЧАЛО
+		$input_path=Yii::getAlias('@finance_csv');
+		if(!is_dir($input_path))
+			throw new \Exception('can\'t find input directory in csv2db.php');
+
+		$recs=DB\DbxFinance::find()
+			->where(['exists'=>1,'csv_converted'=>1,'in_db'=>0])
+			->orderBy(['year'=> SORT_ASC,'month'=> SORT_ASC])->all();
+
+		foreach($recs as $rec){
+			$yearmonth=$rec->year.'.'.$rec->monthStr;
+			$input_filepath=$input_path.'/'.$yearmonth.'.csv';
+			if(!file_exists($input_filepath))
+				throw new \Exception("file $input_filepath not found");
+
+			$file_handle=fopen($input_filepath,'r');
+			if(!$file_handle)
+				throw new \Exception("Не удалось открыть файл $input_filepath!");
+
+			$headers_1=get_table_headers($file_handle,"ТС по расчету");
+			if ($headers_1===false)
+				throw new \Exception("Строка с корректировкой баланса не найдена $yearmonth");
+			fix_headers($headers_1);
+
+			$headers_2=get_table_headers($file_handle,"Дата");
+			if ($headers_2===false)
+				throw new \Exception("Строка с основными заголовком не найдена $yearmonth");
+			fix_headers($headers_2);
+
+			$headers=merge_headers($headers_1,$headers_2);
+			unset($headers_1); unset($headers_2);
+
+			$date_index=array_search('date',$headers);
+			if ($date_index===false)
+				throw new \Exception('В заголовках нет даты '.$yearmonth);
+
+			$maxday=date('d',mktime(0,0,0,$rec->month+1,0,$rec->year));
+
+			for($current_day=1;$current_day<=$maxday;$current_day++){
+				$data=fgetcsv($file_handle,null,';');
+				$date=$data[$date_index];
+				if(!preg_match('/^([\d]{2})\.([\d]{2})\.([\d]{4})$/',$date,$matches) or
+					$matches[1]!=$current_day || $matches[2]!=$rec->month || $matches[3]!=$rec->year) {
+					throw new \Exception('Дата '.$date.' не совпадает с ожидаемой в файле '.$input_filepath);
+				}
+				$date="{$rec->year}.{$rec->monthStr}.{$current_day}";
+				//array_to_utf8($data);
+				for($i=0;$i<count($headers);$i++){
+					if ($headers[$i]===false) continue;
+					$data[$i]=trim($data[$i]);
+					$header_parts=explode('_',$headers[$i]);
+					if (count($header_parts)==1){
+						if($headers[$i]=='realmoney'){
+							if(empty($data[$i])){
+								DB\TransactionCategory::deleteAll(['date'=>$date]);
+							}else{
+								$balance_check=DB\BalanceCheck::findOne(['date'=>$date]);
+								$balance_check=is_object($balance_check) ? $balance_check : new DB\BalanceCheck();
+								$balance_check->attributes=[
+									'date'=>$date,
+									'consider'=>$data[array_search('countmoney',$headers)],
+									'realmoney'=>$data[$i],
+									'diff'=>$data[array_search('difference',$headers)]
+								];
+								$balance_check->save();
+								unset($balance_check);
+							}
+						}
+						continue;
+					}
+					if(empty($data[$i])){
+
+						$tcategoryid=DB\TransactionCategory::find()->select('id')->where(['name'=>$headers[$i]]);
+						DB\Record::deleteAll(['date'=>$date,'transaction_category'=>$tcategoryid]);
+						unset($tcategoryid);
+						continue;
+					}
+					if(count($header_parts)===2){
+						DB\Record::insert_transaction_single($date,$headers[$i],$data[$i]);
+					}elseif(count($header_parts)===3 && $header_parts[2]=='multiple'){
+						$coins=explode('|',$data[$i]);
+						$coins_desc=explode('|',$data[$i+1]);
+						if (count($coins)!=count($coins_desc))
+							throw new \Exception("Неверная запись {$date} : {$data[$i]} {$data[$i+1]} ");
+						$entries=array();
+						for($j=0;$j<count($coins);$j++){
+							$entry=new \stdClass();
+							$coins_desc[$j]=trim($coins_desc[$j]);
+							if(empty($coins_desc[$j]))
+								throw new \Exception("Нет описания $date {$data[$i]} {$data[$i+1]}");
+							$entry->sum=$coins[$j];
+							$entry->item=$coins_desc[$j];
+							$entries[]=clone $entry;
+						}
+						DB\Record::insert_transaction_multiple($date,$headers[$i],$entries);
+						unset($entry); unset($entries);
+					}
+				}
+			}
+			$flags=[
+				0b00001=>'Корректировка',
+				0b00010=>'Всего получено',
+				0b00100=>'Всего потрачено',
+				0b01000=>'Стартовый капитал',
+				0b10000=>'Конечный капитал'
+			];
+			$total_flag= 0b00000;
+			while(($data=fgetcsv($file_handle,null,';'))!==false){
+				if(in_array($data[$date_index],$flags)){
+					$total_flag=$total_flag | array_search($data[$date_index],$flags);
+					$max_date="$rec->year.$rec->monthStr.$maxday";
+					if($data[$date_index]==$flags[0b00001] &&
+						// Корректировка записывается после того, как есть Запись в realmoney последнего дня месяца
+						DB\BalanceCheck::find()->where(['date'=>$max_date])->exists()
+					)
+						DB\Record::insert_transaction_single($max_date,'correcting',$data[$date_index+1],true);
+				}
+			}
+			if (!($total_flag & 0b00001))
+				throw new \Exception('Отсутствуют данные о корректировке '."$rec->year.$rec->monthStr.$maxday");
+
+			fclose($file_handle);
+			echo "file $yearmonth imported to db \n";
+			//updateByPk подошло бы
+			DB\DbxFinance::updateAll(['in_db'=>1],['id'=>$rec->id]);
 		}
+
+		// Удаление названий транзакций, на которых нет ссылки в тбл record
+		//TODO: оптимизировать
+		$item_ids=DB\Record::find()->select('itemid')->distinct();
+		if(!empty($item_ids))
+			DB\Item::deleteAll(['not in','id'],$item_ids);
 	}
 }

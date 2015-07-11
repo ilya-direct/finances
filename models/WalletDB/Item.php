@@ -2,6 +2,7 @@
 
 namespace app\models\WalletDB;
 
+use Dropbox\Exception_BadResponseCode;
 use Yii;
 
 /**
@@ -45,4 +46,24 @@ class Item extends \yii\db\ActiveRecord
             'correct_item_name_id' => 'Correct Item Name ID',
         ];
     }
+
+
+	public function getRecords()
+	{
+		return $this->hasMany(Record::className(), ['itemid' => 'id']);
+	}
+
+
+
+	static public function get_item_id($item_name){
+		$item=trim($item_name);
+		if(empty($item))
+			throw new \Exception('Не допускается пустое имя у элемента!');
+		$item_obj=self::find()->where(['name'=>$item]);
+		if(is_null($item_obj){
+			$item_obj = new self(['name' => $item]);
+			$item_obj->save();
+		}
+		return $item_obj->id;
+	}
 }
