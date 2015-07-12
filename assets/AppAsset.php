@@ -32,6 +32,7 @@ class AppAsset extends AssetBundle
 	    'plugins/modernizr.js',
 	    'plugins/isotope/isotope.pkgd.min.js',
 	    'plugins/jquery.backstretch.min.js',
+	    'plugins/jquery.appear.js',
 	    'js/template.js',
 	    'js/custom.js',
     ];

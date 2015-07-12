@@ -7,6 +7,7 @@ use app\assets\AppAsset;
 
 $asset=AppAsset::register($this);
 $baseUrl=$asset->baseUrl;
+// \Yii::$app->clientScript()->registerScript('helpers',' themepath='.$baseUrl);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
