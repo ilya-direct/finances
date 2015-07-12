@@ -268,7 +268,7 @@ class PHPExcel_Style_NumberFormat extends PHPExcel_Style_Supervisor implements P
 			self::$_builtInFormats[11] = '0.00E+00';
 			self::$_builtInFormats[12] = '# ?/?';
 			self::$_builtInFormats[13] = '# ??/??';
-			self::$_builtInFormats[14] = 'mm-dd-yy';
+			self::$_builtInFormats[14] = 'yyyy.mm.dd'; //mm-dd-yy изменил формат выходной даты
 			self::$_builtInFormats[15] = 'd-mmm-yy';
 			self::$_builtInFormats[16] = 'd-mmm';
 			self::$_builtInFormats[17] = 'mmm-yy';
