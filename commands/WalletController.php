@@ -123,9 +123,9 @@ class WalletController extends \yii\console\Controller
 		function fix_headers(array &$headers){
 			for($i=0; $i<count($headers); $i++){
 				// TODO: оптимизировать (выборка одного поля из DB с возвращением строкой или null)
-				$field_name=(DB\TransactionCategory::find()->select('name')->where(['value'=>$headers[$i]])->one());
-				if(!is_null($field_name)){
-					$field_name=$field_name->name;
+				$field_name_obj=(DB\TransactionCategory::find()->select('name')->where(['value'=>$headers[$i]])->one());
+				if(!is_null($field_name_obj)){
+					$field_name=$field_name_obj->name;
 					$field_array=explode('_',$field_name);
 					if(count($field_array)<=2){
 						$headers[$i]=$field_name;
@@ -219,11 +219,10 @@ class WalletController extends \yii\console\Controller
 			for($current_day=1;$current_day<=$maxday;$current_day++){
 				$data=fgetcsv($file_handle,null,';');
 				$date=$data[$date_index];
-				if(!preg_match('/^([\d]{2})\.([\d]{2})\.([\d]{4})$/',$date,$matches) or
-					$matches[1]!=$current_day || $matches[2]!=$rec->month || $matches[3]!=$rec->year) {
+				if(!preg_match('/^([\d]{4})\.([\d]{2})\.([\d]{2})$/',$date,$matches) or
+					$matches[1]!=$rec->year || $matches[2]!=$rec->month || $matches[3]!=$current_day) {
 					throw new \Exception('Дата '.$date.' не совпадает с ожидаемой в файле '.$input_filepath);
 				}
-				$date="{$rec->year}.{$rec->monthStr}.{$current_day}";
 				//array_to_utf8($data);
 				for($i=0;$i<count($headers);$i++){
 					if ($headers[$i]===false) continue;
@@ -232,7 +231,7 @@ class WalletController extends \yii\console\Controller
 					if (count($header_parts)==1){
 						if($headers[$i]=='realmoney'){
 							if(empty($data[$i])){
-								DB\TransactionCategory::deleteAll(['date'=>$date]);
+								DB\BalanceCheck::deleteAll(['date'=>$date]);
 							}else{
 								$balance_check=DB\BalanceCheck::findOne(['date'=>$date]);
 								$balance_check=is_object($balance_check) ? $balance_check : new DB\BalanceCheck();
@@ -249,10 +248,13 @@ class WalletController extends \yii\console\Controller
 						continue;
 					}
 					if(empty($data[$i])){
-
-						$tcategoryid=DB\TransactionCategory::find()->select('id')->where(['name'=>$headers[$i]]);
-						DB\Record::deleteAll(['date'=>$date,'transaction_category'=>$tcategoryid]);
-						unset($tcategoryid);
+						//TODO: сделать одним запросом
+						$tcategories=DB\TransactionCategory::find()->select('id')->where(['name'=>$headers[$i]])->all();
+						$tcategories=array_map(function($tc){ return $tc->id;},$tcategories);
+						//TODO: сделать более безопасное удаление !!
+						if(!empty($tcategories))
+							DB\Record::deleteAll('date="'.$date.'" and tcategory in ('.implode(',',$tcategories).')');
+						unset($tcategories);
 						continue;
 					}
 					if(count($header_parts)===2){
@@ -309,6 +311,6 @@ class WalletController extends \yii\console\Controller
 		//TODO: оптимизировать
 		$item_ids=DB\Record::find()->select('itemid')->distinct();
 		if(!empty($item_ids))
-			DB\Item::deleteAll(['not in','id'],$item_ids);
+			DB\Item::deleteAll(['not in','id',$item_ids]);
 	}
 }

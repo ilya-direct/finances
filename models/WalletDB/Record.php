@@ -3,7 +3,7 @@
 namespace app\models\WalletDB;
 
 use Yii;
-
+use Yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "record".
  *
@@ -64,7 +64,7 @@ class Record extends \yii\db\ActiveRecord
 		if(count($tcategory_parts)!==3 or $tcategory_parts[2]!='multiple')
 			throw new \Exception("Категория tcategory не является multiple $tcategory\n $date");
 		list($y,$m,$d)=explode('.',$date);
-		$tc=TransactionCategory::find()->select('id','value','sign')->where(['name'=>$tcategory,'deleted'=>0]);
+		$tc=TransactionCategory::find()->select(['id','value','sign'])->where(['name'=>$tcategory,'deleted'=>0])->one();
 		if(!$tc->id or !checkdate($m,$d,$y))
 			throw new \Exception("Несуществующая категория или неверная дата $tc->id $date\n");
 
@@ -73,7 +73,8 @@ class Record extends \yii\db\ActiveRecord
 		else
 			throw new \Exception("Не указан знак категории multiple $tcategory\n");
 
-		$available_ids=Record::find()->select('id')->where(['date'=>$date, 'tcategory'=>$tc->id]);
+		$available_ids=Record::find()->select('id')->where(['date'=>$date, 'tcategory'=>$tc->id])->all();
+		$available_ids=ArrayHelper::getColumn(Record::find()->select('id')->where(['date'=>$date, 'tcategory'=>$tc->id])->all(),'id');
 		foreach($entries as $entry){
 			$rec=new Record();
 			$rec->sum=$sign * abs((int)$entry->sum);
@@ -83,7 +84,7 @@ class Record extends \yii\db\ActiveRecord
 			$rec->tcategory=$tc->id;
 			$rec->date=$date;
 			$rec->id=array_shift($available_ids);
-			if(is_null($entry->id)){
+			if(is_null($rec->id)){
 				$rec->insert();
 			}else{
 				$rec->update();
@@ -96,10 +97,12 @@ class Record extends \yii\db\ActiveRecord
 
 	static public function insert_transaction_single($date,$tcategory,$sum,$with_zero_sum=false){
 		$tcategory_parts=explode('_',$tcategory);
-		if(count($tcategory_parts)!==2)
-			throw new \Exception("Категория tcategory не является single $tcategory\n $date");
+		if(!in_array(count($tcategory_parts),[1,2]))
+			throw new \Exception("Категория $tcategory не является single  $date");
 		// TODO: проверка на то, если отсутствует категория
-		$tc=TransactionCategory::find()->select('id','value','sign')->where(['name'=>$tcategory,'deleted'=>0]);
+		$tc=TransactionCategory::find()->select(['id','value','sign'])->where(['name'=>$tcategory,'deleted'=>0])->one();
+		if(is_null($tc))
+			throw new \Exception("\nНеверное название категории. Категория:{$tcategory}");
 		$sum=(int) $sum;
 		if ($tc->sign=='+') $sum=abs($sum);
 		elseif ($tc->sign=='-') $sum=-abs($sum);
@@ -108,7 +111,7 @@ class Record extends \yii\db\ActiveRecord
 		if((!$with_zero_sum && $sum==0) or !$item_id or !checkdate($m,$d,$y))
 			throw new \Exception("\n\nНеверная транзакция Дата:{$date} Сумма:{$sum} Имя:{$tc->value} Категория:{$tcategory}");
 		$params=['date'=>$date,'tcategory'=>$tc->id,'itemid'=>$item_id];
-		$recs=Record::find()->where($params);
+		$recs=Record::find()->where($params)->all();
 		$rec=array_shift($recs);
 		if(!empty($recs)){
 			throw new \Exception("Найдено более одной записи в single категории ".$tcategory." дата: ".$date);

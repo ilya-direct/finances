@@ -59,8 +59,8 @@ class Item extends \yii\db\ActiveRecord
 		$item=trim($item_name);
 		if(empty($item))
 			throw new \Exception('Не допускается пустое имя у элемента!');
-		$item_obj=self::find()->where(['name'=>$item]);
-		if(is_null($item_obj){
+		$item_obj=self::findOne(['name'=>$item]);
+		if(is_null($item_obj)){
 			$item_obj = new self(['name' => $item]);
 			$item_obj->save();
 		}
