@@ -4,6 +4,7 @@ namespace app\commands;
 use \Dropbox as dbx;
 use Yii;
 use app\models\WalletDB as DB;
+use yii\db\Connection;
 
 class WalletController extends \yii\console\Controller
 {
@@ -313,4 +314,43 @@ class WalletController extends \yii\console\Controller
 		if(!empty($item_ids))
 			DB\Item::deleteAll(['not in','id',$item_ids]);
 	}
+
+	public function actionBalance_check(){
+		function get_correcting_sum($y,$m){
+			$db=new Connection();
+
+			$correcting=$db->createCommand("
+				select r.sum from record r left join transaction_category tc on tc.id=r.tcategory
+				where tc.name='correcting' and year(r.`date`)={$y} and month(r.date)={$m}")->queryOne();
+			return $correcting->sum;
+		}
+
+		function compare_values($actual,$mustbe,$date){
+			if ($actual!=$mustbe)
+				throw new \Exception("$date Сумма по расчету: $actual Должна быть: {$mustbe} false\n");
+		}
+		if(!DB\BalanceCheck::find()->where('year(date)=2013')->exists())
+			throw new \Exception('not initialized with script init');
+
+		$points=DB\BalanceCheck::find()->orderBy('date')->all();;
+		$point_1=array_shift($points);
+		$total_sum=$point_1->consider;
+		foreach($points as $point_2){
+			$sum=DB\Record::find()->select(['sum(sum) as sum'])->where([['>','date',$point_1->date],['<=','date',$point_2->date]])->one();
+			$total_sum+=$sum->sum;
+
+			preg_match('/^([\d]{4})\-([\d]{2})-([\d]{2})/',$point_2->date,$matches);
+			$y=$matches[1]; $m=$matches[2]; $d=$matches[3];
+			$maxday=date('d',mktime(0,0,0,$m+1,0,$y));
+			if ($d==$maxday){
+				$correction=get_correcting_sum($y,$m);
+				compare_values($total_sum-$correction,$point_2->consider,$point_2->date);
+			}else
+				compare_values($total_sum,$point_2->consider,$point_2->date);
+			$point_1=$point_2;
+
+		}
+		echo 'checked'."\n";
+	}
+
 }
