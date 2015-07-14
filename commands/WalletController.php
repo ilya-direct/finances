@@ -317,12 +317,15 @@ class WalletController extends \yii\console\Controller
 
 	public function actionBalance_check(){
 		function get_correcting_sum($y,$m){
-			$db=new Connection();
+			\Yii::$app->db;
+			//print_r(\Yii::$app->db);
+			//die();
+			$db=new \yii\db\Connection(\Yii::$app->db);
 
 			$correcting=$db->createCommand("
 				select r.sum from record r left join transaction_category tc on tc.id=r.tcategory
 				where tc.name='correcting' and year(r.`date`)={$y} and month(r.date)={$m}")->queryOne();
-			return $correcting->sum;
+			return $correcting['sum'];
 		}
 
 		function compare_values($actual,$mustbe,$date){
@@ -336,7 +339,8 @@ class WalletController extends \yii\console\Controller
 		$point_1=array_shift($points);
 		$total_sum=$point_1->consider;
 		foreach($points as $point_2){
-			$sum=DB\Record::find()->select(['sum(sum) as sum'])->where([['>','date',$point_1->date],['<=','date',$point_2->date]])->one();
+			$sum=DB\Record::find()->select(['sum(sum) as sum'])->where(['>','date',$point_1->date])
+				->andWhere(['<=','date',$point_2->date])->one();
 			$total_sum+=$sum->sum;
 
 			preg_match('/^([\d]{4})\-([\d]{2})-([\d]{2})/',$point_2->date,$matches);
