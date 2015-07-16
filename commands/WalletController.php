@@ -244,6 +244,15 @@ class WalletController extends \yii\console\Controller
 								$balance_check->save();
 								unset($balance_check);
 							}
+
+							if($current_day==$maxday){
+								$correcting_id=DB\Item::get_item_id("Корректировка");
+								if(empty($data[$i])){
+									DB\Record::deleteAll(['date'=>$date,'itemid'=>$correcting_id]);
+								}else{
+									DB\Record::insert_transaction_single($date,'correcting',$data[array_search('difference',$headers)],true);
+								}
+							}
 						}
 						continue;
 					}
@@ -279,6 +288,7 @@ class WalletController extends \yii\console\Controller
 					}
 				}
 			}
+			/*
 			$flags=[
 				0b00001=>'Корректировка',
 				0b00010=>'Всего получено',
@@ -300,10 +310,11 @@ class WalletController extends \yii\console\Controller
 			}
 			if (!($total_flag & 0b00001))
 				throw new \Exception('Отсутствуют данные о корректировке '."$rec->year.$rec->monthStr.$maxday");
+			*/
 
 			fclose($file_handle);
 			echo "file $yearmonth imported to db \n";
-			//updateByPk подошло бы
+			//TODO: updateByPk подошло бы лучше
 			DB\DbxFinance::updateAll(['in_db'=>1],['id'=>$rec->id]);
 		}
 
