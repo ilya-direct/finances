@@ -4,7 +4,6 @@ namespace app\commands;
 use \Dropbox as dbx;
 use Yii;
 use app\models\WalletDB as DB;
-use yii\db\Connection;
 
 class WalletController extends \yii\console\Controller
 {
@@ -22,6 +21,7 @@ class WalletController extends \yii\console\Controller
 	    };
 	    $m();
     }
+
     public function actionDbxdownload()
     {
 	    //TODO: добавить константу token в конфиг
@@ -73,7 +73,6 @@ class WalletController extends \yii\console\Controller
 		    }
 	    }
     }
-
 
 	public function actionXlsm2csv(){
 
@@ -318,13 +317,10 @@ class WalletController extends \yii\console\Controller
 	public function actionBalance_check(){
 		function get_correcting_sum($y,$m){
 			\Yii::$app->db;
-			//print_r(\Yii::$app->db);
-			//die();
 			$db=new \yii\db\Connection(\Yii::$app->db);
-
 			$correcting=$db->createCommand("
 				select r.sum from record r left join transaction_category tc on tc.id=r.tcategory
-				where tc.name='correcting' and year(r.`date`)={$y} and month(r.date)={$m}")->queryOne();
+				where tc.name='correcting' and year(r.`date`)=:year and month(r.date)=:month",['year'=>$y,'month'=>$m])->queryOne();
 			return $correcting['sum'];
 		}
 
@@ -357,4 +353,64 @@ class WalletController extends \yii\console\Controller
 		echo 'checked'."\n";
 	}
 
+	public function actionGen_dbx_finance_tbl(){
+		$start_year=2014;
+		$start_month=1;
+		$current_year=(int)date('Y');
+		$current_month=(int)date('m');
+		for($i=$start_year;$i<=$current_year;$i++){
+			$j=($i==$start_year)? $start_month : 1;
+			$jmax=($i==$current_year)? $current_month : 12;
+			for(;$j<=$jmax;$j++){
+				if(!DB\DbxFinance::find()->where(['year'=>$i,'month'=>$j])->exists()){
+					$dbx=new DB\DbxFinance(['year'=>$i,'month'=>$j,'exists'=>0]);
+					$dbx->save();
+				}
+			}
+		}
+	}
+
+	public function actionGen_tcategory(){
+		$fields=[
+			'Мама'=>            ['name'=>'p_mom_multiple','sort'=>2],
+			'Мама (PM)'=>       ['name'=>'p_mompm','sort'=>3],
+			'Ученики'=>         ['name'=>'p_pupils','sort'=>4],
+			'Другие доходы'=>   ['name'=>'p_other_multiple','sort'=>5],
+			'Универ'=>          ['name'=>'m_university','sort'=>6],
+			'MTI'=>             ['name'=>'m_mti','sort'=>7],
+			'бенз'=>            ['name'=>'m_petrol','sort'=>8],
+			'Моб'=>             ['name'=>'m_mobile','sort'=>8,'deleted'=>1],
+			'Мобила'=>          ['name'=>'m_mobile','sort'=>9],
+			'iPad'=>            ['name'=>'m_ipad','sort'=>10],
+			'Гулянки'=>         ['name'=>'m_spend_multiple','sort'=>11],
+			'Другие расходы'=>  ['name'=>'m_other_multiple','sort'=>12],
+			'Корректировка'=>   ['name'=>'correcting','sort'=>13]
+		];
+
+		foreach($fields as $value => $params){
+			if(preg_match('/^([pm])_/',$params['name'],$matches)){
+				$params['sign']=($matches[1]=='p') ? '+' : '-';
+				unset($matches);
+			}
+			//TODO: есть ли функция найтиИлиСоздать, чтобы две строчки ниже сделать одной
+			$tc=DB\TransactionCategory::find()->where(['value'=>$value])->one();
+			$tc=is_object($tc) ? $tc : new DB\TransactionCategory(['value'=>$value]);
+			$tc->attributes=$params;
+			$tc->save();
+		}
+	}
+
+	public function actionInit(){
+		$init_params=[
+			'date'=>'2013-12-31',
+			'realmoney'=>15114,
+			'consider'=>15114,'diff'=>0
+		];
+		if(!DB\BalanceCheck::find()->where($init_params)->exists()){
+			$bc=new DB\BalanceCheck($init_params);
+			$bc->save();
+		}
+		$this->actionGen_dbx_finance_tbl();
+		$this->actionGen_tcategory();
+	}
 }
