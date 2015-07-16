@@ -59,7 +59,7 @@ class WalletController extends \yii\console\Controller
 		    if(!$info) throw new \Exception('not found file '. $yearmonth);
 
 		    $download_filename=$download_path.DIRECTORY_SEPARATOR.$yearmonth.'.xlsm';
-		    if($info['modified']>$rec->download_time || $rec->exists==0){
+		    if($info['modified']>$rec->modified_time || $rec->exists==0){
 			    $rec->download_time=date('Y-m-d H:i:s');
 			    $rec->modified_time=$info['modified'];
 			    $rec->file_name=$info['path'];

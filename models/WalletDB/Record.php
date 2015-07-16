@@ -74,7 +74,9 @@ class Record extends \yii\db\ActiveRecord
 			throw new \Exception("Не указан знак категории multiple $tcategory\n");
 
 		$available_ids=Record::find()->select('id')->where(['date'=>$date, 'tcategory'=>$tc->id])->all();
-		$available_ids=ArrayHelper::getColumn(Record::find()->select('id')->where(['date'=>$date, 'tcategory'=>$tc->id])->all(),'id');
+		$available_ids=array_map(function($el){
+			return $el['id'];
+		},$available_ids);
 		foreach($entries as $entry){
 			$rec=new Record();
 			$rec->sum=$sign * abs((int)$entry->sum);
