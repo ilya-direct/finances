@@ -9,9 +9,11 @@ class WalletController extends \yii\console\Controller
 {
     public function actionIndex()
     {
+	    print_r(\yii::$app->params['adminEmail']);
+	    die();
 	    $DIR=dirname(__FILE__);
 	    $token='OprJKfb4QroAAAAAAAAFZw2tIxGlGCVvvqWn-58KmhEhazh_vSdUvUtpJ_JBTZDS';
-	    $client=new  dbx\Client($token,'directapp','UTF-8');
+	    $client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
 	    $objPHPExcel = \PHPExcel_IOFactory::load($DIR. '/ssss');
 	    $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, false, true, true);
 	    //$finances=$client->getMetadataWithChildren('/finances')['contents'];
@@ -24,9 +26,7 @@ class WalletController extends \yii\console\Controller
 
     public function actionDbxdownload()
     {
-	    //TODO: добавить константу token в конфиг
-	    $token='OprJKfb4QroAAAAAAAAFZw2tIxGlGCVvvqWn-58KmhEhazh_vSdUvUtpJ_JBTZDS';
-	    $client=new  dbx\Client($token,'directapp','UTF-8');
+	    $client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
 
 	    $download_path=Yii::getAlias('@finance_download_path');
 
@@ -423,5 +423,45 @@ class WalletController extends \yii\console\Controller
 		}
 		$this->actionGen_dbx_finance_tbl();
 		$this->actionGen_tcategory();
+	}
+
+	public function actionPer_day(){
+		$start=microtime(true);
+		$this->ActionDbxDownload();
+		$this->ActionXlsm2csv();
+		$this->ActionCsv2db();
+		$this->ActionBalance_check();
+		$time=microtime(true) - $start;
+		$status='OK';
+		$lastrec=DB\Record::find()->orderBy(['date' => SORT_DESC ])->one();
+		$file=fopen(Yii::getAlias('@tests/records.log'),'ab+');
+		fwrite($file,date('Y-m-d H:i:s').' '.__FUNCTION__.' '.$time.' '.$status
+			.' last rec in db: '.$lastrec->date."\n");
+
+		fclose($file);
+
+		// upload log file to  dropbox
+		$client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
+		$file=fopen(Yii::getAlias('@tests/records.log'),'r');
+		$client->uploadFile('/records.log',dbx\WriteMode::force(), $file);
+		fclose($file);
+
+	}
+
+	public function actionPer_month(){
+		$start=microtime(true);
+		$this->ActionGen_dbx_finance_tbl();
+		$time=microtime(true) - $start;
+
+		$status='OK';
+		$file=fopen(Yii::getAlias('@tests/records.log'),'ab+');
+		fwrite($file,date('Y-m-d H:i:s').' '.__FUNCTION__.' '.$time.' '.$status."\n");
+		fclose($file);
+
+		// upload log file to  dropbox
+		$client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
+		$file=fopen(Yii::getAlias('@tests/records.log'),'r');
+		$client->uploadFile('/records.log',dbx\WriteMode::force(), $file);
+		fclose($file);
 	}
 }
