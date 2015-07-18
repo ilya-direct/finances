@@ -73,25 +73,25 @@ class Record extends \yii\db\ActiveRecord
 		else
 			throw new \Exception("Не указан знак категории multiple $tcategory\n");
 
-		$available_ids=Record::find()->select('id')->where(['date'=>$date, 'tcategory'=>$tc->id])->all();
-		$available_ids=array_map(function($el){
-			return $el['id'];
-		},$available_ids);
+		$available_recs=Record::find()->where(['date'=>$date, 'tcategory'=>$tc->id])->all();
+
 		foreach($entries as $entry){
-			$rec=new Record();
+			$rec=array_shift($available_recs);
+
+			$rec=empty($rec) ? new Record() : $rec;
 			$rec->sum=$sign * abs((int)$entry->sum);
 			$rec->itemid=Item::get_item_id($entry->item);
 			if (!$rec->sum or !$rec->itemid)
 				throw new \Exception("Нет суммы или пусное описание $date : $entry->sum $entry->item");
 			$rec->tcategory=$tc->id;
 			$rec->date=$date;
-			$rec->id=array_shift($available_ids);
-			if(is_null($rec->id)){
-				$rec->insert();
-			}else{
-				$rec->update();
-			}
+			$rec->save();
 		}
+
+		// TODO: улучшить код ниже
+		$available_ids=array_map(function($el){
+			return $el['id'];
+		},$available_recs);
 		if (!empty($available_ids)){
 			Record::deleteAll(['in','id',$available_ids]);
 		}
