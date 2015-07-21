@@ -809,7 +809,7 @@ var startRender = function() {
             paths: {
                 experiment: window.jsfolder+'/'+'experiment',
                 modernizr: serviceURL('modernizr'),
-                lodash: getLodashPath({production: serviceURL('lodash'), ios8: 'lodash-ios8'}),
+                lodash: getLodashPath({production: serviceURL('lodash'), ios8: window.jsfolder+'/'+'lodash-ios8'}),
                 //react: {min: 'js/vendor/react-0.13.1.addons.min', source: 'js/vendor/react-0.13.1.addons'}, react 0.13 !!!
                 react: {min: serviceURL('react-with-addons'), source: serviceURL('react-with-addons')},
                 zepto: serviceURL('zepto'),
