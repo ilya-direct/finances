@@ -1,0 +1,277 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin         : 0;
+    padding        : 0;
+    border         : 0;
+    outline        : 0;
+    vertical-align : baseline;
+    background     : transparent;
+}
+
+body{
+    /*line-height: 1;*/
+    font-size   : 10px;
+    font-family : Arial, Helvetica, sans-serif;
+}
+
+textarea, input, select{
+    font-family        : Helvetica, Arial, sans-serif;
+    -webkit-box-sizing : border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing    : border-box; /* Firefox, other Gecko */
+    box-sizing         : border-box; /* Opera/IE 8+ */
+}
+
+ol, ul{
+    list-style : none;
+}
+
+blockquote, q{
+    quotes : none;
+}
+
+:focus{
+    outline : 0;
+}
+
+ins{
+    text-decoration : none;
+}
+
+del{
+    text-decoration : line-through;
+}
+
+table{
+    border-collapse : collapse;
+    border-spacing  : 0;
+}
+
+a {
+    cursor          : pointer;
+    text-decoration : none;
+}
+
+
+/**
+ * End reset
+ */
+
+/**
+ * Set body and site structure to a minimum height of 100%
+ * this causes the body to be smaller than it's content, which means that when scrolling it looks like the content is out of body.
+ */
+html, body{
+    height : 100%;
+}
+
+html.device-mobile-optimized{
+    overflow-x: hidden;
+}
+
+/*************************************
+ * Body overflow settings, BE CAREFUL WHEN CHANGING THIS
+ */
+
+/* When in Public Viewer Mode */
+body {
+    overflow-x : auto;
+    overflow-y : scroll;
+}
+
+/* When in Mobile and in Public Viewer Mode */
+body.device-mobile-optimized{
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+body.device-mobile-optimized #SITE_CONTAINER{
+    width: 320px;
+    overflow-x: visible;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Prevents any block directly inside a body to be wider than it. On some browsers anything that is wider than body can result unexpected zooming */
+body.device-mobile-optimized > * {
+    max-width: 100% !important;
+}
+
+/* On Mobile, site structure should have no inner scroll either */
+body.device-mobile-optimized .SITE_ROOT{
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/* On Mobile with non-optimized view, site structure should have no inner scroll either */
+body.device-mobile-non-optimized .SITE_ROOT{
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body.device-mobile-non-optimized.fullScreenMode .SITE_ROOT, body.device-mobile-non-optimized.fullScreenMode #SITE_BACKGROUND{
+    visibility: hidden;
+}
+
+body.device-mobile-non-optimized.fullScreenMode{
+    background-color: #5F6360;
+}
+
+body.fullScreenMode #MOBILE_ACTIONS_MENU {
+    visibility: hidden;
+}
+
+/* When in full screen mode */
+body.fullScreenMode{
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+}
+
+/* When in wixapps full screen mode for wixapps zoom*/
+body.device-mobile-optimized.fullScreenMode{
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* When in wixapps full screen mode for wixapps zoom temporarily hide site structure*/
+body.device-mobile-optimized.fullScreenMode .SITE_ROOT{
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+}
+
+body.device-mobile-optimized.fullScreenMode #SITE_STRUCTURE{
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    height: auto !important;
+}
+
+body.device-mobile-optimized.fullScreenMode #SITE_BACKGROUND{
+    height: auto !important;
+}
+
+/* When in Text Editor */
+body[contenteditable]{
+    overflow-x : auto;
+    overflow-y : auto;
+}
+
+.wixapps-less-spacers-align.ltr{
+    text-align: left;
+}
+.wixapps-less-spacers-align.center{
+    text-align: center;
+}
+.wixapps-less-spacers-align.rtl{
+    text-align: right;
+}
+.wixapps-less-spacers-align > div, .wixapps-less-spacers-align > a{
+    display: inline-block !important;
+}
+/**
+ * End Body overflow settings
+ *************************************/
+
+
+/*** End fixed positioning for header and footer ***/
+
+.SITE_ROOT{
+    min-height : 100%;
+    position   : relative;
+    margin     : 0 auto;
+}
+
+
+/*******************OLD text classes, DO NOT DELETE ****************/
+
+.bold{
+    font-weight : bold;
+}
+
+.italic{
+    font-style : italic;
+}
+
+.underline{
+    text-decoration : underline;
+}
+
+.lineThrough{
+    text-decoration : line-through;
+}
+
+.singleLineText{
+    white-space   : nowrap;
+    text-overflow : ellipsis;
+}
+
+.alignLeft{
+    text-align : left;
+}
+
+.alignCenter{
+    text-align : center;
+}
+
+.alignRight{
+    text-align : right;
+}
+
+.alignJustify{
+    text-align : justify;
+}
+
+
+/************************  NEW text, used in migration for exceptions **************************/
+ul.font_100, ol.font_100{
+    color : rgb(8, 8, 8); font-family : 'Arial, Helvetica, sans-serif', serif; font-size : 10px; font-style : normal; font-variant : normal; line-height : 1.1em; font-weight : normal; margin : 0; text-decoration : none; line-height : normal; letter-spacing : normal;
+}
+
+.font_100 li, .font_100 li{
+    margin-bottom : 12px
+}
+
+.flex_display {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+/*  padding-top - muhahahaha, check out w3 spec http://www.w3.org/TR/CSS2/box.html#collapsing-margins
+    Incredible! in display:block margin-top collapses!
+*/
+.flex_vbox{
+    box-sizing : border-box;
+    padding-top: 0.01em;
+    padding-bottom: 0.01em;
+}
+
+a.wixAppsLink img {
+    cursor: pointer;
+}
+
+.singleLine {
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: normal;
+}
+
+/* For 3D Transforms Safari Workaround*/
+[data-z-counter]{z-index:0;}
+[data-z-counter="0"]{z-index:auto;}
+
+/* For SplitHtmlText */
+letter{position:relative;display:inline-block;}
+word{display:inline-block;white-space:nowrap;}
+
+word.space,
+letter.space{display:inline;}

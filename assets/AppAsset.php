@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class AppAsset extends AssetBundle
 {
-	public $sourcePath='@app/themes/pk'; // папка, где хранятся все css и js
+	public $sourcePath='@app/themes/pk2'; // папка, где хранятся все css и js
     //public $basePath = '@webroot';
     //public $baseUrl = '@web';
     public $css = [

@@ -134,7 +134,7 @@ return $.bridget;
 // transport
 if ( typeof define === 'function' && define.amd ) {
   // AMD
-  define( 'jquery-bridget/jquery.bridget',[ 'jquery' ], defineBridget );
+  define( 'jquery-bridget/jquery.bridget',[ '../../../.' ], defineBridget );
 } else {
   // get jquery from browser global
   defineBridget( window.jQuery );

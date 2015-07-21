@@ -1,0 +1,71 @@
+{
+    "hs": 7900748,
+    "svSession": "e9d44861993892c75738f13c7688c60b148f109c5592fdcf9c59553a804231504ff9f9491c86a755b2624f00336d9dd61e60994d53964e647acf431e4f798bcd69a5fa2c5affea6f25557a97b61fe84707ef0095ee09558006583f2016b2b04d", "ctToken": "ZGN1MFdXMUxPdSsvdlIzdnY3M3Z2NzBLR0NBUDc3Kzk3Nys5ZW5WQzc3KzlIWG52djcwdjc3KzlkbHp2djcweDc3KzlJQT09fHsidXNlckFnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgNi4xOyBXT1c2NDsgcnY6MzkuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC8zOS4wIiwidmFsaWRUaHJvdWdoIjoiMjAxNS0wNy0yNFQxMDoxMTo0MS4xMjdaIn0=",
+    "clientSpecMap": {
+        "17": {
+            "type": "sitemembers",
+            "applicationId": 17,
+            "collectionType": "Open",
+            "smcollectionId": "44374844-08a6-40f4-b5d1-df7d91c89061",
+            "smtoken": null
+        },
+        "6": {
+            "type": "appbuilder",
+            "applicationId": 6,
+            "appDefinitionId": "3d590cbc-4907-4cc4-b0b1-ddf2c5edf297",
+            "instanceId": "13ef9b18-668f-9ffc-5ba4-0310a7056396",
+            "state": "Initialized"
+        },
+        "18": {
+            "type": "public",
+            "applicationId": 18,
+            "appDefinitionId": "139ef4fa-c108-8f9a-c7be-d5f492a2c939",
+            "appDefinitionName": "Wix Smart Actions",
+            "instance": "hbUz_lrH11_AfZh6rU8vcc8PPbU47x7_bcfh_MDI2w4.eyJpbnN0YW5jZUlkIjoiMTNmMDdkZTgtNWQ2Mi1iNmEwLTU2OTItN2RjZjEwNzBlZjZiIiwic2lnbkRhdGUiOiIyMDE1LTA3LTE3VDEwOjExOjQxLjEyN1oiLCJ1aWQiOm51bGwsInBlcm1pc3Npb25zIjpudWxsLCJpcEFuZFBvcnQiOiI0Ni4yNDIuOC4yOC80MTcwMSIsInZlbmRvclByb2R1Y3RJZCI6bnVsbCwiZGVtb01vZGUiOmZhbHNlLCJhaWQiOiIzZjczZDg4YS0yZjFhLTRiOWUtYWZkNy1jOTA2YjAwMDJhY2QiLCJiaVRva2VuIjoiOWE5NmIyMGEtYzUyZC1mMzBhLWU5ZWUtYjMxY2ZkYTU3MjlkIn0",
+            "sectionUrl": null,
+            "sectionMobileUrl": null,
+            "sectionPublished": true,
+            "sectionMobilePublished": false,
+            "sectionSeoEnabled": true,
+            "sectionDefaultPage": null,
+            "sectionRefreshOnWidthChange": null,
+            "widgets": {},
+            "gluedWidgets": null,
+            "pixelUrl": null,
+            "embeddedScriptUrl": null,
+            "appRequirements": {
+                "requireSiteMembers": false
+            },
+            "installedAtDashboard": true,
+            "permissions": {
+                "revoked": false
+            }
+        },
+        "19": {
+            "type": "public",
+            "applicationId": 19,
+            "appDefinitionId": "135c3d92-0fea-1f9d-2ba5-2a1dfb04297e",
+            "appDefinitionName": "Wix ShoutOut",
+            "instance": "7sOpFtOSsnACcQ_h6_XZGAeTe7L1wlbNwwllVYCr1b0.eyJpbnN0YW5jZUlkIjoiMTNmMDdkZTgtNjAxZC01ODhmLWY3MzItZGU5MTA3MWQ5YWQ4Iiwic2lnbkRhdGUiOiIyMDE1LTA3LTE3VDEwOjExOjQxLjEyN1oiLCJ1aWQiOm51bGwsInBlcm1pc3Npb25zIjpudWxsLCJpcEFuZFBvcnQiOiI0Ni4yNDIuOC4yOC80MTcwMSIsInZlbmRvclByb2R1Y3RJZCI6bnVsbCwiZGVtb01vZGUiOmZhbHNlLCJhaWQiOiI2MTdjZjRmMi01ZTEyLTRkYWItOTU3Zi1mYzZiNmFmNjc3ZDgifQ",
+            "sectionUrl": null,
+            "sectionMobileUrl": null,
+            "sectionPublished": true,
+            "sectionMobilePublished": false,
+            "sectionSeoEnabled": true,
+            "sectionDefaultPage": null,
+            "sectionRefreshOnWidthChange": null,
+            "widgets": {},
+            "gluedWidgets": null,
+            "pixelUrl": null,
+            "embeddedScriptUrl": null,
+            "appRequirements": {
+                "requireSiteMembers": false
+            },
+            "installedAtDashboard": true,
+            "permissions": {
+                "revoked": false
+            }
+        }
+    },
+    "wixSite": false
+}

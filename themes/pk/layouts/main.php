@@ -1,1071 +1,141 @@
 <?php
 use yii\helpers\Html;
-use app\assets\AppAsset;
+use app\assets\PkAsset;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-$asset=AppAsset::register($this);
-$baseUrl=$asset->baseUrl;
-$this->registerJs('var themepath="'.$baseUrl.'";',\yii\web\View::POS_HEAD);
-?>
-<?php $this->beginPage() ?>
-<!DOCTYPE html>
-<!--[if IE 9]> <html lang="<?= Yii::$app->language ?>" class="ie9"> <![endif]-->
-<!--[if !IE]><!-->
-<html lang="<?= Yii::$app->language ?>">
-<!--<![endif]-->
+$asset= PkAsset::register($this);
+$jsfolder=$asset->baseUrl.'/js';
+$cssfolder=$asset->baseUrl.'/css';
+$this->registerJs('var jsfolder="'.$jsfolder.'";'."\n".
+				  'var cssfolder="'.$cssfolder.'";',\yii\web\View::POS_HEAD);
+
+$this->beginPage();
+?><!DOCTYPE html>
+<html>
 <head>
-	<meta charset="<?= Yii::$app->charset ?>">
-	<?= Html::csrfMetaTags() ?>
-	<title><?= Html::encode($this->title) ?></title>
-	<meta name="description" content="Worthy a Bootstrap-based, Responsive HTML5 Template">
-	<!-- Mobile Meta -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta charset="utf-8"/>
+	<title>univecom</title>
+	<meta name="fb_admins_meta_tag" content=""/>
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+	<link rel="apple-touch-icon" href="favicon.ico" type="image/x-icon"/>
+	<link rel="canonical" href="http://vladspitsyn.wix.com/univecom"/>
+	<meta http-equiv="X-Wix-Renderer-Server" content="app47.aus"/>
+	<meta http-equiv="X-Wix-Meta-Site-Id" content="8966cfe2-984f-45aa-bf7c-ced3edd59df6"/>
+	<meta http-equiv="X-Wix-Application-Instance-Id" content="e58cbd83-da8e-4725-ad56-9e933d6b2257"/>
+	<meta http-equiv="X-Wix-Published-Version" content="72"/>
+	<meta http-equiv="etag" content="8c2a35e2d1b49b0d93d2e46e10948ed9"/>
+	<meta name="robots" content="noindex"/>
+	<meta property="og:title" content="univecom"/>
+	<meta property="og:type" content="article"/>
+	<meta property="og:url" content="http://vladspitsyn.wix.com/univecom"/>
+	<meta property="og:site_name" content="univecom"/>
+	<meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE"/>
+	<meta id="wixMobileViewport" name="viewport" content="minimum-scale=0.25, maximum-scale=1.2"/>
+	<script>
+            // BEAT MESSAGE
+    try {
+	    window.wixBiSession = {
+		    initialTimestamp : Date.now(),
+            viewerSessionId: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c)
+                    { var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8); return v.toString(16); }
+            )
+        };
+    } catch (e){}
+    // BEAT MESSAGE END
+	</script>
+    <!-- META DATA -->
+	<script type="text/javascript">
+    var serviceTopology = {
+	    "serverName":"app47.aus",
+	    "cacheKillerVersion":"1",
+	    "staticServerUrl":"http://yii2/",
+	    "usersScriptsRoot":"http://static.parastorage.com/services/wix-users/2.516.0",
+	    "biServerUrl":"http://frog.wix.com/","userServerUrl":"http://users.wix.com/",
+	    "billingServerUrl":"http://premium.wix.com/","mediaRootUrl":"http://static.wixstatic.com/",
+	    "logServerUrl":"http://frog.wix.com/plebs","monitoringServerUrl":"http://TODO/",
+	    "usersClientApiUrl":"https://users.wix.com/wix-users",
+	    "publicStaticBaseUri":"http://static.parastorage.com/services/wix-public/1.165.0",
+	    "basePublicUrl":"http://www.wix.com/","postLoginUrl":"http://www.wix.com/my-account",
+	    "postSignUpUrl":"http://www.wix.com/new/account","baseDomain":"wix.com",
+	    "staticMediaUrl":"http://yii2/images",
+	    "staticAudioUrl":"http://storage.googleapis.com/static.wixstatic.com/mp3",
+	    "emailServer":"http://assets.wix.com/common-services/notification/invoke",
+	    "blobUrl":"http://static.parastorage.com/wix_blob",
+	    "htmlEditorUrl":"http://editor.wix.com/html",
+	    "siteMembersUrl":"https://users.wix.com/wix-sm",
+	    "scriptsLocationMap":{
+		    "wixapps":"http://static.parastorage.com/services/wixapps/2.461.16",
+		    "tpa":"http://static.parastorage.com/services/tpa/2.1050.0",
+		    "santa-resources":"http://static.parastorage.com/services/santa-resources/1.0.0",
+		    "bootstrap":"http://static.parastorage.com/services/bootstrap/2.1229.4",
+		    "ck-editor":"http://static.parastorage.com/services/ck-editor/1.87.2",
+		    "it":"http://static.parastorage.com/services/experiments/it/1.37.0",
+		    "skins":"http://static.parastorage.com/services/skins/2.1229.4",
+		    "core":"http://static.parastorage.com/services/core/2.1229.4",
+		    "sitemembers":"http://static.parastorage.com/services/sm-js-sdk/1.31.0",
+		    "automation":"http://static.parastorage.com/services/automation/1.23.0",
+		    "web":"http://static.parastorage.com/services/web/2.1229.4",
+		    "ecommerce":"http://static.parastorage.com/services/ecommerce/1.193.0",
+		    "hotfixes":"http://static.parastorage.com/services/experiments/hotfixes/1.15.0",
+		    "langs":"http://static.parastorage.com/services/langs/2.554.0",
+		    "santa-versions":"http://static.parastorage.com/services/santa-versions/1.315.0",
+		    "ut":"http://static.parastorage.com/services/experiments/ut/1.2.0"},
+	    "developerMode":false,"productionMode":true,"staticServerFallbackUrl":"https://sslstatic.wix.com/",
+	    "staticVideoUrl":"http://video.wixstatic.com/","killerFeatureUrl":"http://api.aus.wixpress.com/wix-killer-feature-webapp",
+	    "scriptsDomainUrl":"http://yii2/","userFilesUrl":"http://static.parastorage.com/",
+	    "staticHTMLComponentUrl":"http://vladspitsyn.wix.com.usrfiles.com/","secured":false,
+	    "ecommerceCheckoutUrl":"https://www.safer-checkout.com/","premiumServerUrl":"https://premium.wix.com/",
+	    "appRepoUrl":"http://assets.wix.com/wix-lists-ds-webapp","digitalGoodsServerUrl":"http://dgs.wixapps.net/",
+	    "wixCloudBaseDomain":"cloud.wix.com","publicStaticsUrl":"http://static.parastorage.com/services/wix-public/1.165.0",
+	    "staticDocsUrl":"http://media.wix.com/ugd"};
+        var santaModels = true;
+    var rendererModel = {"metaSiteId":"8966cfe2-984f-45aa-bf7c-ced3edd59df6",
+	    "siteInfo":{
+		    "documentType":"UGC",
+		    "applicationType":"HtmlWeb",
+		    "siteId":"e58cbd83-da8e-4725-ad56-9e933d6b2257",
+		    "siteTitleSEO":"univecom"},
+	        "clientSpecMap":{"17":{"type":"sitemembers","applicationId":17,"collectionType":"Open","smcollectionId":"44374844-08a6-40f4-b5d1-df7d91c89061"},"6":{"type":"appbuilder","applicationId":6,"appDefinitionId":"3d590cbc-4907-4cc4-b0b1-ddf2c5edf297","instanceId":"13ef9b18-668f-9ffc-5ba4-0310a7056396","state":"Initialized"},"18":{"type":"public","applicationId":18,"appDefinitionId":"139ef4fa-c108-8f9a-c7be-d5f492a2c939","appDefinitionName":"Wix Smart Actions","instance":"GBSXBJR1M7QJD3swejrxcoCvjs7euStOep-_1ETpmEw.eyJpbnN0YW5jZUlkIjoiMTNmMDdkZTgtNWQ2Mi1iNmEwLTU2OTItN2RjZjEwNzBlZjZiIiwic2lnbkRhdGUiOiIyMDE1LTA3LTE4VDIyOjAyOjExLjY4MVoiLCJpcEFuZFBvcnQiOiI0Ni4yNDIuOC4yOC81MDUzMCIsImRlbW9Nb2RlIjpmYWxzZSwiYmlUb2tlbiI6IjlhOTZiMjBhLWM1MmQtZjMwYS1lOWVlLWIzMWNmZGE1NzI5ZCJ9","sectionPublished":true,"sectionMobilePublished":false,"sectionSeoEnabled":true,"widgets":{},"appRequirements":{"requireSiteMembers":false},"installedAtDashboard":true,"permissions":{"revoked":false}},"19":{"type":"public","applicationId":19,"appDefinitionId":"135c3d92-0fea-1f9d-2ba5-2a1dfb04297e","appDefinitionName":"Wix ShoutOut","instance":"5TSLlKSDfK85p0rJ3QelPPzR4ensZ_mc0qhmL5OuqXs.eyJpbnN0YW5jZUlkIjoiMTNmMDdkZTgtNjAxZC01ODhmLWY3MzItZGU5MTA3MWQ5YWQ4Iiwic2lnbkRhdGUiOiIyMDE1LTA3LTE4VDIyOjAyOjExLjY4MVoiLCJpcEFuZFBvcnQiOiI0Ni4yNDIuOC4yOC81MDUzMCIsImRlbW9Nb2RlIjpmYWxzZX0","sectionPublished":true,"sectionMobilePublished":false,"sectionSeoEnabled":true,"widgets":{},"appRequirements":{"requireSiteMembers":false},"installedAtDashboard":true,"permissions":{"revoked":false}}},"premiumFeatures":[],"geo":"RUS","languageCode":"ru","previewMode":false,"userId":"4503474f-eb52-4451-84f6-7977fb09f31f","siteMetaData":{"preloader":{"enabled":false},"adaptiveMobileOn":true,"quickActions":{"socialLinks":[],"colorScheme":"dark","configuration":{"quickActionsMenuEnabled":false,"navigationMenuEnabled":true,"phoneEnabled":false,"emailEnabled":false,"addressEnabled":false,"socialLinksEnabled":false}},"contactInfo":{"companyName":"","phone":"","fax":"","email":"","address":""}},"runningExperiments":{"autogeneratedshapesskins":"new","lang_no":"new","ngcore":"new","sandboxiframeineditor":"new","lang_nl":"new","wixappsgalleries":"new","ecomgalleries":"new","disablehorizontalmenu":"new","lazyprovision":"new","atntfixlists":"new","newfacebooklikebox":"new","lang_da":"new","exitmobilemode":"new","workaroundsaveddeadcompskin":"new","nougcanalytics":"new","appbuilderdeletetype":"new","sitepagesvalidation":"new","redirectfeature301data":"new","linkfixeroverride":"new","redirectfeature301":"new","lazyprovisiontemp":"new","animation3dfix":"new","landingpagesupport":"new","lang_sv":"new","wixappstranslation":"new","subscribeformsendnewsletter":"new","lesserwidthissue":"new","appbuildertags":"new","sitenavigationrefactor":"new","blogrss":"new","animationnewbehaviors":"new","customsitemenu":"new","blogmanager":"new"}};
+    var publicModel = {
+	    "domain":"wix.com","externalBaseUrl":"http:\/\/vladspitsyn.wix.com\/univecom",
+	    "externalBaseUrl2":"http:\/\/yii2\/",
+	    "unicodeExternalBaseUrl":"http:\/\/vladspitsyn.wix.com\/univecom",
+	    "pageList":{"masterPage":[
+		    "http:\/\/yii2/js/_71.json",
+	  "http:\/\/yii2/js/_71.json",
+      "http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_b78a8d31409957e593d4cc3abf6ec166_71.json"],
+		    "pages":[{"pageId":"c16s4",
+			    "title":"ТЕХНОЛОГИИ",
+			    "urls":[
+				    "http:\/\/static.wixstatic.com\/sites\/450347_0681118e9701f3be4a2fb8fdd24da891_47.json.z?v=3",
+				    "http:\/\/staticorigin.wixstatic.com\/sites\/450347_0681118e9701f3be4a2fb8fdd24da891_47.json.z?v=3",
+				    "http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_0681118e9701f3be4a2fb8fdd24da891_47.json"]},
+			    {"pageId":"c1gd9","title":"ГЛАВНАЯ",
+			"urls":["http:\/\/yii2/js/_65.json",
+				"http:\/\/yii2/js/_65.json",
+				"http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_d4e5b1f59ddd06f271c686d05ba0fce0_65.json"
+			]},{"pageId":"c1se","title":"О КАФЕДРЕ","urls":["http:\/\/static.wixstatic.com\/sites\/450347_510079d24e8568c86f8ab79c10cdc9c8_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_510079d24e8568c86f8ab79c10cdc9c8_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_510079d24e8568c86f8ab79c10cdc9c8_47.json"]},{"pageId":"c11m6","title":"ОБУЧЕНИЕ","urls":["http:\/\/static.wixstatic.com\/sites\/450347_460fdf3ac038877d50ae0daa3d74b424_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_460fdf3ac038877d50ae0daa3d74b424_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_460fdf3ac038877d50ae0daa3d74b424_47.json"]},{"pageId":"ccjp","title":"НАУКА","urls":["http:\/\/static.wixstatic.com\/sites\/450347_e0392d95c26e3c4cd57ebae9943db148_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_e0392d95c26e3c4cd57ebae9943db148_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_e0392d95c26e3c4cd57ebae9943db148_47.json"]},{"pageId":"c1ylq","title":"ФЕДЕРАЛЬНЫЙ ЦЕНТР","urls":["http:\/\/static.wixstatic.com\/sites\/450347_85f59f11e6d2c8a386e695abf376a112_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_85f59f11e6d2c8a386e695abf376a112_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_85f59f11e6d2c8a386e695abf376a112_47.json"]},{"pageId":"c6kh","title":"О Нас 1","urls":["http:\/\/static.wixstatic.com\/sites\/450347_fa536120f22a8cb3e0bf7124b10fc4fb_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_fa536120f22a8cb3e0bf7124b10fc4fb_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_fa536120f22a8cb3e0bf7124b10fc4fb_47.json"]},{"pageId":"c1mc5","title":"ЭЛЕКТРОННЫЙ ЖУРНАЛ","urls":["http:\/\/static.wixstatic.com\/sites\/450347_03bce9eaf0d9bdc7ef6106d58043333a_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_03bce9eaf0d9bdc7ef6106d58043333a_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_03bce9eaf0d9bdc7ef6106d58043333a_47.json"]},{"pageId":"c13w","title":"КОНТАКТНАЯ ИНФОРМАЦИЯ","urls":["http:\/\/static.wixstatic.com\/sites\/450347_05b08b8526c518670614abcfa7faea0c_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_05b08b8526c518670614abcfa7faea0c_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_05b08b8526c518670614abcfa7faea0c_47.json"]},{"pageId":"c70d","title":"БИБЛИОТЕКА","urls":["http:\/\/static.wixstatic.com\/sites\/450347_9c14db1e0eac46c3efe6c13d6d9c2073_47.json.z?v=3","http:\/\/staticorigin.wixstatic.com\/sites\/450347_9c14db1e0eac46c3efe6c13d6d9c2073_47.json.z?v=3","http:\/\/fallback.wix.com\/wix-html-editor-pages-webapp\/page\/450347_9c14db1e0eac46c3efe6c13d6d9c2073_47.json"]}],"mainPageId":"c1gd9"},"timeSincePublish":189558692,"favicon":""};
+    var googleAnalytics = "";
+    var googleRemarketing = "";
+    var facebookRemarketing = "";
+    var yandexMetrikaData = {};
 
-	<?php $this->head() ?>
-
-	<!-- Favicon -->
-	<link rel="shortcut icon" href="images/favicon.ico">
-
-	<!-- Web Fonts -->
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700,300&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Raleway:700,400,300' rel='stylesheet' type='text/css'>
-
+</script>
+    <meta name="fragment" content="!"/>
+    <script type="text/javascript">
+         var santaBase = '';
+        var clientSideRender = true;
+    </script>
+	<?php $this->head(); ?>
 </head>
-
-<body class="no-trans">
+<body>
 <?php $this->beginBody() ?>
-<!-- scrollToTop -->
-<!-- ================ -->
-<div class="scrollToTop"><i class="icon-up-open-big"></i></div>
-
-<!-- header start -->
-<!-- ================ -->
-<header class="header fixed clearfix navbar navbar-fixed-top">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-4">
-
-				<!-- header-left start -->
-				<!-- ================ -->
-				<div class="header-left clearfix">
-
-					<!-- logo -->
-					<div class="logo smooth-scroll">
-						<a href="#banner"><img id="logo" src="<?=$baseUrl?>/images/logo.png" alt="Worthy"></a>
-					</div>
-
-					<!-- name-and-slogan -->
-					<div class="site-name-and-slogan smooth-scroll">
-						<div class="site-name"><a href="#banner">Worthy</a></div>
-						<div class="site-slogan">Free Bootstrap Theme by <a target="_blank" href="http://htmlcoder.me">HtmlCoder</a></div>
-					</div>
-
-				</div>
-				<!-- header-left end -->
-
-			</div>
-			<div class="col-md-8">
-
-				<!-- header-right start -->
-				<!-- ================ -->
-				<div class="header-right clearfix">
-
-					<!-- main-navigation start -->
-					<!-- ================ -->
-					<div class="main-navigation animated">
-
-						<!-- navbar start -->
-						<!-- ================ -->
-						<nav class="navbar navbar-default" role="navigation">
-							<div class="container-fluid">
-
-								<!-- Toggle get grouped for better mobile display -->
-								<div class="navbar-header">
-									<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
-										<span class="sr-only">Toggle navigation</span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-									</button>
-								</div>
-
-								<!-- Collect the nav links, forms, and other content for toggling -->
-								<div class="collapse navbar-collapse scrollspy smooth-scroll" id="navbar-collapse-1">
-									<ul class="nav navbar-nav navbar-right">
-										<li class="active"><a href="#banner">Home</a></li>
-										<li><a href="#about">About</a></li>
-										<li><a href="#services">Services</a></li>
-										<li><a href="#portfolio">Portfolio</a></li>
-										<li><a href="#clients">Clients</a></li>
-										<li><a href="#contact">Contact</a></li>
-									</ul>
-								</div>
-
-							</div>
-						</nav>
-						<!-- navbar end -->
-
-					</div>
-					<!-- main-navigation end -->
-
-				</div>
-				<!-- header-right end -->
-
-			</div>
-		</div>
-	</div>
-</header>
-<!-- header end -->
-
-<!-- banner start -->
-<!-- ================ -->
-<div id="banner" class="banner">
-	<div class="banner-image"></div>
-	<div class="banner-caption">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-8 col-md-offset-2 object-non-visible" data-animation-effect="fadeIn">
-					<h1 class="text-center">We are <span>Worthy</span></h1>
-					<p class="lead text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos debitis provident nulla illum minus enim praesentium repellendus ullam cupiditate reiciendis optio voluptatem, recusandae nobis quis aperiam, sapiente libero ut at.</p>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- banner end -->
-
-<!-- section start -->
-<!-- ================ -->
-<div class="section clearfix object-non-visible" data-animation-effect="fadeIn">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<h1 id="about" class="title text-center">About <span>Worthy</span></h1>
-				<p class="lead text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta officia, aspernatur.</p>
-				<div class="space"></div>
-				<div class="row">
-					<div class="col-md-6">
-						<img src="<?=$baseUrl?>/images/section-image-1.png" alt="">
-						<div class="space"></div>
-					</div>
-					<div class="col-md-6">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi adipisci illo, voluptatum ipsam fuga error commodi architecto, laudantium culpa tenetur at id, beatae placeat deserunt iure quas voluptas fugit eveniet.</p>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo ducimus explicabo quibusdam temporibus deserunt doloremque pariatur ea, animi a. Delectus similique atque eligendi, enim vel reiciendis deleniti neque aliquid, sit?</p>
-						<ul class="list-unstyled">
-							<li><i class="fa fa-caret-right pr-10 text-colored"></i> Lorem ipsum dolor sit amet</li>
-							<li><i class="fa fa-caret-right pr-10 text-colored"></i> Reiciendis deleniti neque aliquid</li>
-							<li><i class="fa fa-caret-right pr-10 text-colored"></i> Ipsam fuga error commodi</li>
-							<li><i class="fa fa-caret-right pr-10 text-colored"></i> Lorem ipsum dolor sit amet</li>
-							<li><i class="fa fa-caret-right pr-10 text-colored"></i> Dignissimos molestiae necessitatibus</li>
-						</ul>
-					</div>
-				</div>
-				<div class="space"></div>
-				<h2>Becessitatibus quae beatae possimus ullam</h2>
-				<div class="row">
-					<div class="col-md-6">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi adipisci illo, voluptatum ipsam fuga error commodi architecto, laudantium culpa tenetur at id, beatae placeat deserunt iure quas voluptas fugit eveniet.</p>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo ducimus explicabo quibusdam temporibus deserunt doloremque pariatur ea, animi a. Delectus similique atque eligendi, enim vel reiciendis deleniti neque aliquid, sit?</p>
-						<p>Vitae dolores quam magnam accusantium nam, voluptatibus expedita delectus, dolorum odio magni ut nemo nihil ex earum pariatur molestias velit eveniet, facere autem saepe aut. Ut minima itaque porro facere. Cumque vitae autem, dignissimos molestiae necessitatibus culpa aliquam deleniti soluta sunt voluptatibus tenetur, unde dolorem eligendi doloribus quibusdam facere totam. Possimus atque deserunt numquam aliquam magnam, facilis officiis illo alias ipsa voluptas laborum, praesentium eveniet nobis velit voluptatem odio eligendi, corporis et iste distinctio! Repellendus, id, ad.</p>
-					</div>
-					<div class="col-md-6">
-						<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-							<div class="panel panel-default">
-								<div class="panel-heading" role="tab" id="headingOne">
-									<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-											Collapsible Group Item #1
-										</a>
-									</h4>
-								</div>
-								<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-									<div class="panel-body">
-										Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher.
-									</div>
-								</div>
-							</div>
-							<div class="panel panel-default">
-								<div class="panel-heading" role="tab" id="headingTwo">
-									<h4 class="panel-title">
-										<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-											Collapsible Group Item #2
-										</a>
-									</h4>
-								</div>
-								<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-									<div class="panel-body">
-										Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-									</div>
-								</div>
-							</div>
-							<div class="panel panel-default">
-								<div class="panel-heading" role="tab" id="headingThree">
-									<h4 class="panel-title">
-										<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-											Collapsible Group Item #3
-										</a>
-									</h4>
-								</div>
-								<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-									<div class="panel-body">
-										Richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic.
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- section end -->
-
-<!-- section start -->
-<!-- ================ -->
-<div class="section translucent-bg bg-image-1 blue">
-	<div class="container object-non-visible" data-animation-effect="fadeIn">
-		<h1 id="services"  class="text-center title">Worthy Services</h1>
-		<div class="space"></div>
-		<div class="row">
-			<div class="col-sm-6">
-				<div class="media">
-					<div class="media-body text-right">
-						<h4 class="media-heading">Service 1</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-					<div class="media-right">
-						<i class="fa fa-cog"></i>
-					</div>
-				</div>
-				<div class="media">
-					<div class="media-body text-right">
-						<h4 class="media-heading">Service 2</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-					<div class="media-right">
-						<i class="fa fa-check"></i>
-					</div>
-				</div>
-				<div class="media">
-					<div class="media-body text-right">
-						<h4 class="media-heading">Service 3</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-					<div class="media-right">
-						<i class="fa fa-desktop"></i>
-					</div>
-				</div>
-				<div class="media">
-					<div class="media-body text-right">
-						<h4 class="media-heading">Service 4</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-					<div class="media-right">
-						<i class="fa fa-users"></i>
-					</div>
-				</div>
-			</div>
-			<div class="space visible-xs"></div>
-			<div class="col-sm-6">
-				<div class="media">
-					<div class="media-left">
-						<i class="fa fa-leaf"></i>
-					</div>
-					<div class="media-body">
-						<h4 class="media-heading">Service 5</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-				</div>
-				<div class="media">
-					<div class="media-left">
-						<i class="fa fa-area-chart"></i>
-					</div>
-					<div class="media-body">
-						<h4 class="media-heading">Service 6</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-				</div>
-				<div class="media">
-					<div class="media-left">
-						<i class="fa fa-child"></i>
-					</div>
-					<div class="media-body">
-						<h4 class="media-heading">Service 7</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-				</div>
-				<div class="media">
-					<div class="media-left">
-						<i class="fa fa-codepen"></i>
-					</div>
-					<div class="media-body">
-						<h4 class="media-heading">Service 8</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus, voluptate eaque suscipit iste placeat.</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- section end -->
-
-<!-- section start -->
-<!-- ================ -->
-<div class="default-bg space blue">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
-				<h1 class="text-center">Let's Work Together!</h1>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- section end -->
-
-<!-- section start -->
-<!-- ================ -->
-<div class="section">
-<div class="container">
-<h1 class="text-center title" id="portfolio">Portfolio</h1>
-<div class="separator"></div>
-<p class="lead text-center">Lorem ipsum dolor sit amet laudantium molestias similique.<br> Quisquam incidunt ut laboriosam.</p>
-<br>
-<div class="row object-non-visible" data-animation-effect="fadeIn">
-<div class="col-md-12">
-
-<!-- isotope filters start -->
-<div class="filters text-center">
-	<ul class="nav nav-pills">
-		<li class="active"><a href="#" data-filter="*">All</a></li>
-		<li><a href="#" data-filter=".web-design">Web design</a></li>
-		<li><a href="#" data-filter=".app-development">App development</a></li>
-		<li><a href="#" data-filter=".site-building">Site building</a></li>
-	</ul>
-</div>
-<!-- isotope filters end -->
-
-<!-- portfolio items start -->
-<div class="isotope-container row grid-space-20">
-<div class="col-sm-6 col-md-3 isotope-item web-design">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-1.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-1">
-				<i class="fa fa-search-plus"></i>
-				<span>Web Design</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-1">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-1" tabindex="-1" role="dialog" aria-labelledby="project-1-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-1-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-1.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item app-development">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-2.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-2">
-				<i class="fa fa-search-plus"></i>
-				<span>App Development</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-2">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-2" tabindex="-1" role="dialog" aria-labelledby="project-2-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-2-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-2.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item web-design">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-3.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-3">
-				<i class="fa fa-search-plus"></i>
-				<span>Web Design</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-3">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-3" tabindex="-1" role="dialog" aria-labelledby="project-3-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-3-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-3.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item site-building">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-4.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-4">
-				<i class="fa fa-search-plus"></i>
-				<span>Site Building</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-4">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-4" tabindex="-1" role="dialog" aria-labelledby="project-4-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-4-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-4.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item app-development">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-5.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-5">
-				<i class="fa fa-search-plus"></i>
-				<span>App Development</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-5">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-5" tabindex="-1" role="dialog" aria-labelledby="project-5-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-5-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-5.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item web-design">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-6.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-6">
-				<i class="fa fa-search-plus"></i>
-				<span>Web Design</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-6">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-6" tabindex="-1" role="dialog" aria-labelledby="project-6-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-6-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-6.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item site-building">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-7.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-7">
-				<i class="fa fa-search-plus"></i>
-				<span>Site Building</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-7">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-7" tabindex="-1" role="dialog" aria-labelledby="project-7-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-7-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-7.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item web-design">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-8.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-8">
-				<i class="fa fa-search-plus"></i>
-				<span>Web Design</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-8">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-8" tabindex="-1" role="dialog" aria-labelledby="project-8-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-8-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-8.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item web-design">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-9.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-9">
-				<i class="fa fa-search-plus"></i>
-				<span>Web Design</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-9">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-9" tabindex="-1" role="dialog" aria-labelledby="project-9-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-9-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-9.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item site-building">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-10.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-10">
-				<i class="fa fa-search-plus"></i>
-				<span>Site Building</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-10">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-10" tabindex="-1" role="dialog" aria-labelledby="project-10-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-10-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-10.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item web-design">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-11.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-11">
-				<i class="fa fa-search-plus"></i>
-				<span>Web Design</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-11">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-11" tabindex="-1" role="dialog" aria-labelledby="project-11-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-11-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-11.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-<div class="col-sm-6 col-md-3 isotope-item app-development">
-	<div class="image-box">
-		<div class="overlay-container">
-			<img src="<?=$baseUrl?>/images/portfolio-12.jpg" alt="">
-			<a class="overlay" data-toggle="modal" data-target="#project-12">
-				<i class="fa fa-search-plus"></i>
-				<span>App Development</span>
-			</a>
-		</div>
-		<a class="btn btn-default btn-block" data-toggle="modal" data-target="#project-12">Project Title</a>
-	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="project-12" tabindex="-1" role="dialog" aria-labelledby="project-12-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title" id="project-12-label">Project Title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Project Description</h3>
-					<div class="row">
-						<div class="col-md-6">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-						</div>
-						<div class="col-md-6">
-							<img src="<?=$baseUrl?>/images/portfolio-12.jpg" alt="">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal end -->
-</div>
-
-</div>
-<!-- portfolio items end -->
-
-</div>
-</div>
-</div>
-</div>
-<!-- section end -->
-
-<!-- section start -->
-<!-- ================ -->
-<div class="section translucent-bg bg-image-2 pb-clear">
-	<div class="container object-non-visible" data-animation-effect="fadeIn">
-		<h1 id="clients" class="title text-center">Clients</h1>
-		<div class="space"></div>
-		<div class="row">
-			<div class="col-md-4">
-				<div class="media testimonial">
-					<div class="media-left">
-						<img src="<?=$baseUrl?>/images/testimonial-1.png" alt="">
-					</div>
-					<div class="media-body">
-						<h3 class="media-heading">You are Amazing!</h3>
-						<blockquote>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo.</p>
-							<footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="media testimonial">
-					<div class="media-left">
-						<img src="<?=$baseUrl?>/images/testimonial-2.png" alt="">
-					</div>
-					<div class="media-body">
-						<h3 class="media-heading">Yeah!</h3>
-						<blockquote>
-							<p>Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus.</p>
-							<footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="media testimonial">
-					<div class="media-left">
-						<img src="<?=$baseUrl?>/images/testimonial-3.png" alt="">
-					</div>
-					<div class="media-body">
-						<h3 class="media-heading">Thank You!</h3>
-						<blockquote>
-							<p>Aperiam consequatur quo quis exercitationem reprehenderit suscipit iste placeat.</p>
-							<footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<div class="media testimonial">
-					<div class="media-left">
-						<img src="<?=$baseUrl?>/images/testimonial-2.png" alt="">
-					</div>
-					<div class="media-body">
-						<h3 class="media-heading">Thank You!</h3>
-						<blockquote>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure aperiam consequatur quo.</p>
-							<footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="media testimonial">
-					<div class="media-left">
-						<img src="<?=$baseUrl?>/images/testimonial-3.png" alt="">
-					</div>
-					<div class="media-body">
-						<h3 class="media-heading">Amazing!</h3>
-						<blockquote>
-							<p>Iure aperiam consequatur quo quis exercitationem reprehenderit dolor vel ducimus.</p>
-							<footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="media testimonial">
-					<div class="media-left">
-						<img src="<?=$baseUrl?>/images/testimonial-1.png" alt="">
-					</div>
-					<div class="media-body">
-						<h3 class="media-heading">Best!</h3>
-						<blockquote>
-							<p>Aperiam consequatur quo quis exercitationem reprehenderit suscipit iste placeat.</p>
-							<footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- section start -->
-	<!-- ================ -->
-	<div class="translucent-bg blue">
-		<div class="container">
-			<div class="list-horizontal">
-				<div class="row">
-					<div class="col-xs-2">
-						<div class="list-horizontal-item">
-							<img src="<?=$baseUrl?>/images/client-1.png" alt="client">
-						</div>
-					</div>
-					<div class="col-xs-2">
-						<div class="list-horizontal-item">
-							<img src="<?=$baseUrl?>/images/client-2.png" alt="client">
-						</div>
-					</div>
-					<div class="col-xs-2">
-						<div class="list-horizontal-item">
-							<img src="<?=$baseUrl?>/images/client-3.png" alt="client">
-						</div>
-					</div>
-					<div class="col-xs-2">
-						<div class="list-horizontal-item">
-							<img src="<?=$baseUrl?>/images/client-4.png" alt="client">
-						</div>
-					</div>
-					<div class="col-xs-2">
-						<div class="list-horizontal-item">
-							<img src="<?=$baseUrl?>/images/client-5.png" alt="client">
-						</div>
-					</div>
-					<div class="col-xs-2">
-						<div class="list-horizontal-item">
-							<img src="<?=$baseUrl?>/images/client-6.png" alt="client">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- section end -->
-</div>
-<!-- section end -->
-
-<!-- section start -->
-<!-- ================ -->
-<div class="default-bg space">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
-				<h1 class="text-center">10000+ Happy Clients!</h1>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- section end -->
-
-<!-- footer start -->
-<!-- ================ -->
-<footer id="footer">
-
-	<!-- .footer start -->
-	<!-- ================ -->
-	<div class="footer section">
-		<div class="container">
-			<h1 class="title text-center" id="contact">Contact Us</h1>
-			<div class="space"></div>
-			<div class="row">
-				<div class="col-sm-6">
-					<div class="footer-content">
-						<p class="large">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel nam magnam natus tempora cumque, aliquam deleniti voluptatibus voluptas. Repellat vel, et itaque commodi iste ab, laudantium voluptas deserunt nobis.</p>
-						<ul class="list-icons">
-							<li><i class="fa fa-map-marker pr-10"></i> One infinity loop, 54100</li>
-							<li><i class="fa fa-phone pr-10"></i> +00 1234567890</li>
-							<li><i class="fa fa-fax pr-10"></i> +00 1234567891 </li>
-							<li><i class="fa fa-envelope-o pr-10"></i> your@email.com</li>
-						</ul>
-						<ul class="social-links">
-							<li class="facebook"><a target="_blank" href="https://www.facebook.com/pages/HtmlCoder/714570988650168"><i class="fa fa-facebook"></i></a></li>
-							<li class="twitter"><a target="_blank" href="https://twitter.com/HtmlcoderMe"><i class="fa fa-twitter"></i></a></li>
-							<li class="googleplus"><a target="_blank" href="http://plus.google.com"><i class="fa fa-google-plus"></i></a></li>
-							<li class="skype"><a target="_blank" href="http://www.skype.com"><i class="fa fa-skype"></i></a></li>
-							<li class="linkedin"><a target="_blank" href="http://www.linkedin.com"><i class="fa fa-linkedin"></i></a></li>
-							<li class="youtube"><a target="_blank" href="http://www.youtube.com"><i class="fa fa-youtube"></i></a></li>
-							<li class="flickr"><a target="_blank" href="http://www.flickr.com"><i class="fa fa-flickr"></i></a></li>
-							<li class="pinterest"><a target="_blank" href="http://www.pinterest.com"><i class="fa fa-pinterest"></i></a></li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-sm-6">
-					<div class="footer-content">
-						<form role="form" id="footer-form">
-							<div class="form-group has-feedback">
-								<label class="sr-only" for="name2">Name</label>
-								<input type="text" class="form-control" id="name2" placeholder="Name" name="name2" required>
-								<i class="fa fa-user form-control-feedback"></i>
-							</div>
-							<div class="form-group has-feedback">
-								<label class="sr-only" for="email2">Email address</label>
-								<input type="email" class="form-control" id="email2" placeholder="Enter email" name="email2" required>
-								<i class="fa fa-envelope form-control-feedback"></i>
-							</div>
-							<div class="form-group has-feedback">
-								<label class="sr-only" for="message2">Message</label>
-								<textarea class="form-control" rows="8" id="message2" placeholder="Message" name="message2" required></textarea>
-								<i class="fa fa-pencil form-control-feedback"></i>
-							</div>
-							<input type="submit" value="Send" class="btn btn-default">
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- .footer end -->
-
-	<!-- .subfooter start -->
-	<!-- ================ -->
-	<div class="subfooter">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-					<p class="text-center">Copyright © 2014 Worthy by <a target="_blank" href="http://htmlcoder.me">HtmlCoder</a>.</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- .subfooter end -->
-
-</footer>
-<!-- footer end -->
-
- <?php $this->endBody() // всякие дополнительные скрипты и стили ?>
+	<div id="SITE_CONTAINER"></div>
+	<div comp="wysiwyg.viewer.components.WixAds" skin="wysiwyg.viewer.skins.wixadsskins.WixAdsWebSkin" id="wixFooter"></div>
+<?php $this->endBody(); ?>
 </body>
 </html>
 <?php $this->endPage() ?>
