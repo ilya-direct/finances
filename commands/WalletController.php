@@ -85,7 +85,9 @@ class WalletController extends \yii\console\Controller
 			throw new \Exception('can\'t create output directory');
 
 
-		$recs=DB\DbxFinance::find()->where(['exists'=>1,'csv_converted'=>0])->orderBy('year ASC, month ASC')->all();
+		$recs=DB\DbxFinance::find()
+				->where(['exists'=>1,'csv_converted'=>0])
+				->orderBy(['year'=> SORT_ASC,'month'=>SORT_ASC])->all();
 		foreach($recs as $rec){
 			$file_name=$rec->year.'.'.$rec->monthStr;
 			$input_filepath=$input_path.'/'.$file_name.'.xlsm';
@@ -94,7 +96,7 @@ class WalletController extends \yii\console\Controller
 				$objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
 				$objWriter->setDelimiter(";");
 				$objWriter->setEnclosure("");
-				$objPHPExcel->getActiveSheet()->getStyle('C:C')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+//				$objPHPExcel->getActiveSheet()->getStyle('C:C')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 //				$objWriter->setPreCalculateFormulas(false);
 				$output_filepath=$output_path.'/'.$file_name.'.csv';
 				$objWriter->save($output_filepath);
@@ -326,42 +328,32 @@ class WalletController extends \yii\console\Controller
 	}
 
 	public function actionBalance_check(){
-		function get_correcting_sum($y,$m){
-			\Yii::$app->db;
-			$db=new \yii\db\Connection(\Yii::$app->db);
-			$correcting=$db->createCommand("
-				select r.sum from record r left join transaction_category tc on tc.id=r.tcategory
-				where tc.name='correcting' and year(r.`date`)=:year and month(r.date)=:month",['year'=>$y,'month'=>$m])->queryOne();
-			return $correcting['sum'];
-		}
 
 		function compare_values($actual,$mustbe,$date){
 			if ($actual!=$mustbe)
-				throw new \Exception("$date Сумма по расчету: $actual Должна быть: {$mustbe} false\n");
+				throw new \Exception("$date Sum in calculation: $actual Must be: {$mustbe} false\n");
 		}
 		if(!DB\BalanceCheck::find()->where('year(date)=2013')->exists())
 			throw new \Exception('not initialized with script init');
 
-		$points=DB\BalanceCheck::find()->orderBy('date')->all();;
+		$points=DB\BalanceCheck::find()->orderBy('date')->all();
 		$point_1=array_shift($points);
 		$total_sum=$point_1->consider;
 		foreach($points as $point_2){
-			$sum=DB\Record::find()->select(['sum(sum) as sum'])->where(['>','date',$point_1->date])
+			$sum=DB\Record::find()->select(['sum(sum) as sum'])
+				->where(['>','date',$point_1->date])
 				->andWhere(['<=','date',$point_2->date])->one();
 			$total_sum+=$sum->sum;
-
-			preg_match('/^([\d]{4})\-([\d]{2})-([\d]{2})/',$point_2->date,$matches);
-			$y=$matches[1]; $m=$matches[2]; $d=$matches[3];
+			list($y,$m,$d)=explode('-',$point_2->date);
 			$maxday=date('d',mktime(0,0,0,$m+1,0,$y));
 			if ($d==$maxday){
-				$correction=get_correcting_sum($y,$m);
-				compare_values($total_sum-$correction,$point_2->consider,$point_2->date);
+				compare_values($total_sum,$point_2->consider+$point_2->diff,$point_2->date);
 			}else
 				compare_values($total_sum,$point_2->consider,$point_2->date);
 			$point_1=$point_2;
 
 		}
-		echo 'checked'."\n";
+		echo 'balance checked'."\n";
 	}
 
 	public function actionGen_dbx_finance_tbl(){
