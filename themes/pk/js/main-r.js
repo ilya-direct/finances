@@ -1312,13 +1312,13 @@ var startRender = function() {
     }
     siteModel.baseVersion = reactSource || (window.reactVersions && window.reactVersions.base);
     requirejs.config(config);
-
+    /*
     try {
-        document.domain = getSubdomain(document.domain);
+        // document.domain = getSubdomain(document.domain);
     } catch (e) {
         // empty
     }
-
+    */
     window.isPreview = queryUtil.isParameterTrue.bind(packagesUtil, 'isEdited');
     var isPreview = queryUtil.isParameterTrue('isEdited');
     var isServerSide = !(window.clientSideRender || window.location.hash || isPreview);
