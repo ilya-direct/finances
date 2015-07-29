@@ -10,14 +10,6 @@ class WalletController extends \yii\console\Controller
     public function actionIndex()
     {
 	    print_r(\yii::$app->params['adminEmail']);
-	    die();
-	    $DIR=dirname(__FILE__);
-	    $token='OprJKfb4QroAAAAAAAAFZw2tIxGlGCVvvqWn-58KmhEhazh_vSdUvUtpJ_JBTZDS';
-	    $client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
-	    $objPHPExcel = \PHPExcel_IOFactory::load($DIR. '/ssss');
-	    $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, false, true, true);
-	    //$finances=$client->getMetadataWithChildren('/finances')['contents'];
-	    //x();
 	    $m=function (){
 		    print('xxx');
 	    };
@@ -36,12 +28,7 @@ class WalletController extends \yii\console\Controller
 
 
 	    $finances=$client->getMetadataWithChildren('/finances')['contents'];
-	    $finances=array_map(function($el){
-		    $el['modified']=dbx\Client::parseDateTime($el['modified'])->format("Y-m-d H:i:s");
-		    return $el;
-	    },$finances);
-
-	    $recs=DB\DbxFinance::find()->orderBy('year ASC, month ASC')->all();
+	    $recs=DB\DbxFinance::find()->orderBy(['year'=> SORT_ASC,'month' => SORT_DESC])->all();
 	    // --- функция поиска
 	    function search_info($pattern,$finances){
 		    foreach($finances as $fin){
@@ -59,6 +46,7 @@ class WalletController extends \yii\console\Controller
 		    if(!$info) throw new \Exception('not found file '. $yearmonth);
 
 		    $download_filename=$download_path.DIRECTORY_SEPARATOR.$yearmonth.'.xlsm';
+		    $info['modified']=dbx\Client::parseDateTime($info['modified'])->format("Y-m-d H:i:s");
 		    if($info['modified']>$rec->modified_time || $rec->exists==0){
 			    $rec->download_time=date('Y-m-d H:i:s');
 			    $rec->modified_time=$info['modified'];
@@ -86,7 +74,7 @@ class WalletController extends \yii\console\Controller
 
 
 		$recs=DB\DbxFinance::find()
-				->where(['exists'=>1,'csv_converted'=>0])
+				->where(['and',['exists'=>1],['csv_converted'=>0]])
 				->orderBy(['year'=> SORT_ASC,'month'=>SORT_ASC])->all();
 		foreach($recs as $rec){
 			$file_name=$rec->year.'.'.$rec->monthStr;
@@ -96,11 +84,11 @@ class WalletController extends \yii\console\Controller
 				$objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
 				$objWriter->setDelimiter(";");
 				$objWriter->setEnclosure("");
-//				$objPHPExcel->getActiveSheet()->getStyle('C:C')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 //				$objWriter->setPreCalculateFormulas(false);
 				$output_filepath=$output_path.'/'.$file_name.'.csv';
 				$objWriter->save($output_filepath);
 				$rec->csv_converted=1;
+				$rec->in_db=0;
 				$rec->update();
 				echo "file $file_name converted\n";
 			}else
@@ -164,7 +152,7 @@ class WalletController extends \yii\console\Controller
 		function merge_headers($h1,$h2){
 			global $yearmonth;
 			$n=(count($h1)>count($h2)) ? count($h1) : count($h2);
-			$result=array();
+			$result=[];
 			for($i=0; $i<$n ;++$i){
 				if(empty($h1[$i])){
 					if(empty($h2[$i]))
@@ -275,7 +263,7 @@ class WalletController extends \yii\console\Controller
 						$coins_desc=explode('|',$data[$i+1]);
 						if (count($coins)!=count($coins_desc))
 							throw new \Exception("Неверная запись {$date} : {$data[$i]} {$data[$i+1]} ");
-						$entries=array();
+						$entries=[];
 						for($j=0;$j<count($coins);$j++){
 							$entry=new \stdClass();
 							$coins_desc[$j]=trim($coins_desc[$j]);
