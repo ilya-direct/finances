@@ -7,13 +7,9 @@ use app\models\WalletDB as DB;
 
 class WalletController extends \yii\console\Controller
 {
-    public function actionIndex()
+    public function actionIndex($nox)
     {
-	    print_r(\yii::$app->params['adminEmail']);
-	    $m=function (){
-		    print('xxx');
-	    };
-	    $m();
+	    print $nox;
     }
 
     public function actionDbxdownload()
@@ -90,7 +86,7 @@ class WalletController extends \yii\console\Controller
 				$rec->csv_converted=1;
 				$rec->in_db=0;
 				$rec->update();
-				echo "file $file_name converted\n";
+				echo "$file_name converted\n";
 			}else
 				throw new \Exception("file $input_filepath not found\n");
 		}
@@ -303,7 +299,7 @@ class WalletController extends \yii\console\Controller
 			*/
 
 			fclose($file_handle);
-			echo "file $yearmonth imported to db \n";
+			echo "$yearmonth imported to db \n";
 			//TODO: updateByPk подошло бы лучше
 			DB\DbxFinance::updateAll(['in_db'=>1],['id'=>$rec->id]);
 		}
@@ -341,7 +337,7 @@ class WalletController extends \yii\console\Controller
 			$point_1=$point_2;
 
 		}
-		echo 'balance checked'."\n";
+		echo 'balance ok'."\n";
 	}
 
 	public function actionGen_dbx_finance_tbl(){
@@ -405,7 +401,16 @@ class WalletController extends \yii\console\Controller
 		$this->actionGen_tcategory();
 	}
 
-	public function actionPer_day(){
+	private function uploadToDropbox($ffrom,$fto,$mode=null){
+		if(is_null($mode)) $mode=dbx\WriteMode::force();
+
+		$client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
+		$file=fopen($ffrom,'rb');
+		$client->uploadFile($fto,$mode, $file);
+		fclose($file);
+	}
+
+	public function actionPer_day($to_dbx=1){
 		$start=microtime(true);
 		$this->ActionDbxDownload();
 		$this->ActionXlsm2csv();
@@ -419,13 +424,9 @@ class WalletController extends \yii\console\Controller
 			.' last rec in db: '.$lastrec->date."\n");
 
 		fclose($file);
-
 		// upload log file to  dropbox
-		$client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
-		$file=fopen(Yii::getAlias('@tests/records.log'),'r');
-		$client->uploadFile('/records.log',dbx\WriteMode::force(), $file);
-		fclose($file);
-
+		$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
+		echo 'Last record: '.$lastrec->date."\n";
 	}
 
 	public function actionPer_month(){
@@ -439,9 +440,6 @@ class WalletController extends \yii\console\Controller
 		fclose($file);
 
 		// upload log file to  dropbox
-		$client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
-		$file=fopen(Yii::getAlias('@tests/records.log'),'r');
-		$client->uploadFile('/records.log',dbx\WriteMode::force(), $file);
-		fclose($file);
+		$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
 	}
 }
