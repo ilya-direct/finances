@@ -8,6 +8,10 @@ use yii\helpers\ArrayHelper;
 
 class ShopController extends Controller
 {
+	public function options($id){
+		return ['sss'];
+	}
+	public $sss='m';
 	public function actionIndex()
 	{
 

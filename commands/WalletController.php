@@ -409,8 +409,13 @@ class WalletController extends \yii\console\Controller
 		$client->uploadFile($fto,$mode, $file);
 		fclose($file);
 	}
-
-	public function actionPer_day($to_dbx=1){
+	public function options($id){
+		if( in_array($id,['per_day','per_month']))
+			return ['no_dbx'];
+		return [];
+	}
+	public $no_dbx=false;
+	public function actionPer_day(){
 		$start=microtime(true);
 		$this->ActionDbxDownload();
 		$this->ActionXlsm2csv();
@@ -425,7 +430,8 @@ class WalletController extends \yii\console\Controller
 
 		fclose($file);
 		// upload log file to  dropbox
-		$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
+		if($this->no_dbx)
+			$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
 		echo 'Last record: '.$lastrec->date."\n";
 	}
 
@@ -440,6 +446,7 @@ class WalletController extends \yii\console\Controller
 		fclose($file);
 
 		// upload log file to  dropbox
-		$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
+		if($this->no_dbx)
+			$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
 	}
 }
