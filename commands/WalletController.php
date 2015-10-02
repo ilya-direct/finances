@@ -411,10 +411,10 @@ class WalletController extends \yii\console\Controller
 	}
 	public function options($id){
 		if( in_array($id,['per_day','per_month']))
-			return ['no_dbx'];
+			return ['to_dbx'];
 		return [];
 	}
-	public $no_dbx=false;
+	public $to_dbx=true;
 	public function actionPer_day(){
 		$start=microtime(true);
 		$this->ActionDbxDownload();
@@ -430,7 +430,7 @@ class WalletController extends \yii\console\Controller
 
 		fclose($file);
 		// upload log file to  dropbox
-		if($this->no_dbx)
+		if($this->to_dbx)
 			$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
 		echo 'Last record: '.$lastrec->date."\n";
 	}
@@ -446,7 +446,7 @@ class WalletController extends \yii\console\Controller
 		fclose($file);
 
 		// upload log file to  dropbox
-		if($this->no_dbx)
+		if($this->to_dbx)
 			$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
 	}
 }
