@@ -20,11 +20,11 @@ class WalletController extends \yii\console\Controller
 
 		//TODO: Заменить is_dir функцией из библиотеки YII
 	    if(!is_dir($download_path) and !\yii\helpers\FileHelper::createDirectory($download_path,0777,true))
-		    throw new \Exception('can\'t create download directory');
+		    throw new \Exception('can\'t open download directory');
 
 
 	    $finances=$client->getMetadataWithChildren('/finances')['contents'];
-	    $recs=DB\DbxFinance::find()->orderBy(['year'=> SORT_ASC,'month' => SORT_DESC])->all();
+	    $recs=DB\DbxFinance::find()->orderBy(['year'=> SORT_ASC,'month' => SORT_ASC])->all();
 	    // --- функция поиска
 	    function search_info($pattern,$finances){
 		    foreach($finances as $fin){
@@ -424,14 +424,14 @@ class WalletController extends \yii\console\Controller
 		$time=microtime(true) - $start;
 		$status='OK';
 		$lastrec=DB\Record::find()->orderBy(['date' => SORT_DESC ])->one();
-		$file=fopen(Yii::getAlias('@tests/records.log'),'ab+');
+		$file=fopen(Yii::getAlias('@temp/records.log'),'ab+');
 		fwrite($file,date('Y-m-d H:i:s').' '.__FUNCTION__.' '.$time.' '.$status
 			.' last rec in db: '.$lastrec->date."\n");
 
 		fclose($file);
 		// upload log file to  dropbox
 		if($this->to_dbx)
-			$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
+			$this->uploadToDropbox(Yii::getAlias('@temp/records.log'),'/records.log');
 		echo 'Last record: '.$lastrec->date."\n";
 	}
 
@@ -441,12 +441,12 @@ class WalletController extends \yii\console\Controller
 		$time=microtime(true) - $start;
 
 		$status='OK';
-		$file=fopen(Yii::getAlias('@tests/records.log'),'ab+');
+		$file=fopen(Yii::getAlias('@temp/records.log'),'ab+');
 		fwrite($file,date('Y-m-d H:i:s').' '.__FUNCTION__.' '.$time.' '.$status."\n");
 		fclose($file);
 
 		// upload log file to  dropbox
 		if($this->to_dbx)
-			$this->uploadToDropbox(Yii::getAlias('@tests/records.log'),'/records.log');
+			$this->uploadToDropbox(Yii::getAlias('@temp/records.log'),'/records.log');
 	}
 }

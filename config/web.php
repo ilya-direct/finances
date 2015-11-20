@@ -38,7 +38,7 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
-	    'view' => [
+	    /*'view' => [
 		    'theme' => [
 			    'pathMap' => [ // pathMap – it override the original path to theme path.
 				    '@app/views' => [
@@ -46,7 +46,7 @@ $config = [
 				    ]
 			    ],
 		    ],
-	    ]
+	    ]*/
     ],
     'params' => $params,
 ];

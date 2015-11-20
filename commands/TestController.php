@@ -6,7 +6,7 @@ use yii\console\Controller;
 use app\models\CompanyDB\Service;
 use yii\helpers\ArrayHelper;
 
-class ShopController extends Controller
+class TestController extends Controller
 {
 	public function options($id){
 		return ['sss'];
@@ -15,9 +15,10 @@ class ShopController extends Controller
 	public function actionIndex()
 	{
 
-		$data=ArrayHelper::map(Service::find()->orderBy('name')->all(),'id','name');
-//		print_r($data);
+		//$data=ArrayHelper::map(Service::find()->orderBy('name')->all(),'id','name');
+		$data=")))";
 		//print();
-		file_put_contents(dirname(__FILE__).'/shopTest.txt',print_r($data,true));
+		$file=Yii::getAlias('@temp/shopTest.txt');
+		file_put_contents($file,print_r($data,true));
 	}
 }

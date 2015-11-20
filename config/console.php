@@ -1,10 +1,9 @@
 <?php
 
-Yii::setAlias('@tests', dirname(__DIR__) . DIRECTORY_SEPARATOR .'tests');
-Yii::setAlias('@data', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'data');
+Yii::setAlias('@temp', dirname(__DIR__) . DIRECTORY_SEPARATOR .'temp');
+Yii::setAlias('@data', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'temp'. DIRECTORY_SEPARATOR .'data');
 Yii::setAlias('@finance_download_path', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_download');
 Yii::setAlias('@finance_csv', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_csv');
-
 
 
 $params = require(__DIR__ . '/params.php');
