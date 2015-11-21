@@ -2,6 +2,7 @@
 
 Yii::setAlias('@temp', dirname(__DIR__) . DIRECTORY_SEPARATOR .'temp');
 Yii::setAlias('@data', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'temp'. DIRECTORY_SEPARATOR .'data');
+Yii::setAlias('@templates', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'templates');
 Yii::setAlias('@finance_download_path', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_download');
 Yii::setAlias('@finance_csv', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_csv');
 

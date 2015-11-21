@@ -449,4 +449,46 @@ class WalletController extends \yii\console\Controller
 		if($this->to_dbx)
 			$this->uploadToDropbox(Yii::getAlias('@temp/records.log'),'/records.log');
 	}
+
+	public function actionGeneratexlsx(){
+		$year=date('Y');
+		$month=date('m');
+		$start_sum="=231+(2312+22)+2323";
+		$path=Yii::getAlias('@templates/month_template.xlsx');
+		// Открываем файл
+		$xlsx = \PHPExcel_IOFactory::load($path);
+		// Устанавливаем индекс активного листа
+		$xlsx->setActiveSheetIndex(0);
+		// Получаем активный лист
+		$sheet = $xlsx->getActiveSheet();
+		// Вставляем месяц и год в ячейку C4
+		$months= [1=>'Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+		$sheet->setCellValue('C4',$months[$month].' '.$year);
+		// Вставляем Стартовый капитал в ячейку E5
+		$sheet->setCellValue('E5',$start_sum);
+
+
+		$maxday=date('d',mktime(0,0,0,$month+1,0,$year));
+		$monthstr=sprintf("%02d", $month);
+		$days=['вс','пн','вт','ср','чт','пт','сб'];
+		$start_weekday=date('w',time());
+		for($i=1; $i<=$maxday; $i++){
+			// Запись даты
+			$sheet->setCellValueByColumnAndRow(2,8+$i, sprintf("%02d", $i).'.'.$monthstr.'.'.$year);
+			$weekday=($start_weekday+ $i-1) % 7;
+			// Запись дня недели в ячейку
+			$sheet->setCellValueByColumnAndRow(3,8+$i, $days[$weekday]);
+			if($weekday==0)
+				//жирная нижняя граница
+				$xlsx->getActiveSheet()->getStyle('C'.(8+$i).':S'.(8+$i))
+						->getBorders()->getBottom()->setBorderStyle(\PHPExcel_Style_Border::BORDER_MEDIUM);
+		}
+		$objWriter = \PHPExcel_IOFactory::createWriter($xlsx, 'Excel2007');;
+		// Сохранение
+		$output=Yii::getAlias('@temp/month_template.xlsx');
+		if(file_exists($output)){
+			$output=Yii::getAlias('@temp/month_template(2).xlsx');
+		}
+		$objWriter->save($output);
+	}
 }
