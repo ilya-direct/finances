@@ -3,5 +3,5 @@
 
 return [
     'adminEmail' => 'ilya-direct@ya.ru',
-	'dbx_token'  => 'OprJKfb4QroAAAAAAAAFZw2tIxGlGCVvvqWn-58KmhEhazh_vSdUvUtpJ_JBTZDS'
+	'dbx_token'  => 'OprJKfb4QroAAAAAAAAJb_GL_geE8ZItdGoOFFUTmvtIyBSLkyOPQBdMDEzJCJAg'
 ];
