@@ -38,6 +38,7 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'dbFin2016'=> require(__DIR__ . '/dbFin2016.php'),
 	    /*'view' => [
 		    'theme' => [
 			    'pathMap' => [ // pathMap – it override the original path to theme path.

@@ -4,12 +4,14 @@ namespace app\commands;
 use \Dropbox as dbx;
 use Yii;
 use app\models\WalletDB as DB;
+use yii\helpers\Console;
 
 class WalletController extends \yii\console\Controller
 {
     public function actionIndex($nox)
     {
-	    print $nox;
+        $this->stderr("Creating migration history table ".$nox, Console::FG_YELLOW);
+	    //print $nox;
     }
 
     public function actionDbxdownload()
@@ -409,10 +411,12 @@ class WalletController extends \yii\console\Controller
 		$client->uploadFile($fto,$mode, $file);
 		fclose($file);
 	}
-	public function options($id){
-		if( in_array($id,['per_day','per_month']))
-			return ['to_dbx'];
-		return [];
+	public function options($actionID){
+        $options=[];
+		if( in_array($actionID,['per_day','per_month','index']))
+            $options=['to_dbx','dfdf'];
+		return  array_merge(
+            parent::options($actionID),$options);
 	}
 	public $to_dbx=true;
 	public function actionPer_day(){
@@ -457,8 +461,9 @@ class WalletController extends \yii\console\Controller
 		$date = new \DateTime("$year-$month-1");
 		$date->sub(new \DateInterval('P1D'));
 
-		$bc=DB\BalanceCheck::findOne(['date'=> $date->format('Y-m-d')]);
-		$start_sum=is_object($bc) ? $bc->realmoney : $start_sum="";
+		//$bc=DB\BalanceCheck::findOne(['date'=> $date->format('Y-m-d')]);
+		//$start_sum=is_object($bc) ? $bc->realmoney : $start_sum="";
+		$start_sum=0;
 		unset($bc);
 
 		$path=Yii::getAlias('@templates/month_template_2016.xlsx');
@@ -497,4 +502,7 @@ class WalletController extends \yii\console\Controller
 		$output=Yii::getAlias('@temp/'.$year.'.'.$monthstr.'.xlsx');
 		$objWriter->save($output);
 	}
+
+
+
 }

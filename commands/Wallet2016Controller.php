@@ -1,9 +1,10 @@
 <?php
 
 namespace app\commands;
+use app\commands\models\helpers\ExcelHelper;
 use \Dropbox as dbx;
 use Yii;
-use app\models\WalletDB as DB;
+use app\models\Finance2016 as DB;
 use yii\helpers\ArrayHelper;
 
 class Wallet2016Controller extends \yii\console\Controller
@@ -13,45 +14,40 @@ class Wallet2016Controller extends \yii\console\Controller
         print "Hello ".$nox;
     }
 
-    public function actionDbxdownload()
+    public function actionDbxDownload()
     {
         $client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
 
-        $download_path=Yii::getAlias('@finance_download_path');
+        $downloadPath=Yii::getAlias('@finance_download_path');
 
-
-        if(!is_dir($download_path) and !\yii\helpers\FileHelper::createDirectory($download_path,0777,true))
+        if(!is_dir($downloadPath) and !\yii\helpers\FileHelper::createDirectory($downloadPath,0777,true))
             throw new \Exception('can\'t open download directory');
 
 
         $finances=$client->getMetadataWithChildren('/finances')['contents'];
-        $recs=DB\DbxFinance::find()->where('year=>2016')->orderBy(['year'=> SORT_ASC,'month' => SORT_ASC])->all();
-        // --- функция поиска
-        function search_info($pattern,$finances){
-            foreach($finances as $fin){
-                if(preg_match('/'.$pattern.'/',$fin['path'])){
-                    return $fin;
-                }
-            }
-            return false;
-        };
-        // ---
+        $recs=DB\DbxFinance::find()
+            ->where(['>=','year',2016])
+            ->orderBy(['year'=> SORT_ASC,'month' => SORT_ASC])->all();
+        $files=[];
+        foreach($finances as $fin){
+            $files[basename($fin['path'], ".xlsm")]=$fin;
+        }
         foreach( $recs as $rec){
             $yearmonth=$rec->year.'.'.$rec->monthStr;
-            //TODO: решить проблему с API и убрать функцию SEARCH_INFO
-            $info=search_info($yearmonth.'xlsx',$finances);
-            if(!$info) throw new \Exception('not found file '. $yearmonth);
+            $info=isset($files[$yearmonth]) ? $files[$yearmonth] : false;
 
-            $download_filename=$download_path.DIRECTORY_SEPARATOR.$yearmonth.'.xlsm';
+            if(!$info)
+                throw new \Exception('not found file '. $yearmonth);
+
+            $downloadFilePath=$downloadPath.'/'.$yearmonth.'.xlsm';
             $info['modified']=dbx\Client::parseDateTime($info['modified'])->format("Y-m-d H:i:s");
-            if($info['modified']>$rec->modified_time || $rec->exists==0){
-                $rec->download_time=date('Y-m-d H:i:s');
+            if($info['modified']>$rec->modified_time || $rec->downloaded==0){
+                $rec->downloaded_time=date('Y-m-d H:i:s');
                 $rec->modified_time=$info['modified'];
                 $rec->file_name=$info['path'];
-                $rec->exists=1;
+                $rec->downloaded=1;
                 $rec->in_db=0;
-                $rec->csv_converted=0;
-                if(!is_null($client->getFile($info['path'],fopen($download_filename,'wb')))){
+                if(!is_null($client->getFile($info['path'],fopen($downloadFilePath,'wb')))){
                     $rec->update();
                     echo "$yearmonth updated\n";
                 }
@@ -63,14 +59,18 @@ class Wallet2016Controller extends \yii\console\Controller
     public function actionParseXlsx(){
         $fins=DB\DbxFinance::find()
             ->where(['>=','year',2016])
-            ->orderBy(['year'=> SORT_ASC,'month' => SORT_ASC,'downloaded'=>1])->all();
+            ->andWhere(['downloaded'=>1])
+            ->orderBy(['year'=> SORT_ASC,'month' => SORT_ASC])
+            ->all();
         $input_dir=Yii::getAlias('@finance_download_path');
         if(!is_dir($input_dir))
             throw new \Exception('can\'t find input directory');
-        $zeroDayRow=8; // ряд  заголовков в файле
-        $xlsx=new ExcelHelper();
+
+        $dateColumn=DB\XlsxColumn::getDateLetter(); //  колонка с датой
+        $zeroDayRow=yii::$app->params['headerRow']; // ряд  заголовков в файле
+
         foreach($fins as $fin){
-            $file_name=$fin->year.'.'.$fin->monthStr.'xlsx';
+            $file_name=$fin->year.'.'.$fin->monthStr.'.xlsm';
             $input_filepath=$input_dir.'/'.$file_name;
             if(!file_exists($input_filepath))
                 throw new \Exception("file $input_filepath not found");
@@ -79,70 +79,103 @@ class Wallet2016Controller extends \yii\console\Controller
             $document->setActiveSheetIndex(0);
             // Получаем активный лист
             $sheet = $document->getActiveSheet();
-            $pColumns=DB\TransactionCategory::fileColumns();
-            $xlsx->check_header($sheet,$pColumns); // проверка совпадения заголовков в файле с заданными
-            $max_day=date('d',mktime(0,0,0,$fin->month+1,0,$fin->year));
+            $xlsx=new ExcelHelper($sheet);
+            $pColumns=DB\XlsxColumn::findAll(['deleted'=>0]);
+            $xlsx->checkHeaders($pColumns); // проверка совпадения заголовков в файле с заданными
+            $maxDay=date('d',mktime(0,0,0,$fin->month+1,0,$fin->year)); // максимальный день месяца
 
             $date=new \DateTime();
-
-            for($current_day=1;$current_day<=$max_day;$current_day++){
+            for($current_day=1;$current_day<=$maxDay;$current_day++){
+                $currentRow=$zeroDayRow+$current_day;
                 $date->setDate($fin->year,$fin->month,$current_day);
-                $date_cell=$sheet->getCell($xlsx->getDateLetter().$xlsx->dayRow($current_day));
-                if($date_cell->getValue()!==$date->format('d.m.Y')){
-                    throw new \Exception('Date '.$date.' is different from file date  '
-                        .$date_cell->getValue().'in '.$input_filepath);
+                $dateValue=$xlsx->getCellValue($dateColumn,$currentRow);
+
+                if($dateValue!==$date->format('d.m.Y')){
+                    throw new \Exception('Date '.$date->format('d.m.Y').' is different from file date  '
+                        .$dateValue.' in '.$input_filepath);
                 }
 
                 foreach($pColumns as $column){
-                    $cell=$sheet->getCell($column->letter.$xlsx->dayRow($current_day));
-                    $cellValue=$cell->getValue();
-                    if(empty($cellValue)){
-                        $xlsx->clearDb($date->format('Y-m-d'),$column);
+                    if( $column->type == DB\XlsxColumn::TYPE_DATE )
+                        continue;
+                    $cell=$xlsx->getCell( $column->letter, $currentRow);
+                    $cellValue=$cell->getFormattedValue();
+                    if(empty($cellValue)){ // пустая строка
+                        DB\Record::clearDb($date->format('Y-m-d'),$column);
                         continue;
                     }
                     switch($column->type){
-                        case 'single':
-                            DB\Record::insert_single($date->format('Y-m-d'),$column->name,$cellValue);
+                        case DB\XlsxColumn::TYPE_SINGLE:
+                            DB\Record::insertSingle($date,$column,$cellValue);
                             break;
-                        case 'multiple':
-                            //$desc_letter=chr(ord($cell->getColumn())+1);
-                            //$desc=$sheet->getCell($desc_letter.($zeroDayRow+$current_day));
-                            $descValue=$xlsx->nextCell($cell)->getValue();
-                            DB\Record::insert_multiple($date->format('Y-m-d'),$column->name,$cellValue,$descValue);
+                        case DB\XlsxColumn::TYPE_MULTIPLE:
+                            $columnCell=$cell->getColumn();
+                            $rowCell=$cell->getRow();
+                            $descValue=$xlsx->nextCell($columnCell,$rowCell)->getValue();
+                            DB\Record::insertMultiple($date->format('Y-m-d'),$column,$cellValue,$descValue);
                             break;
-                        case 'note':
-                            DB\Note::insert_note($date->format('Y-m-d'),$cellValue);
+                        case DB\XlsxColumn::TYPE_NOTE:
+                            DB\Note::insertNote($date->format('Y-m-d'),$cellValue);
                             break;
-                        case 'realmoney':
-                            $realmoney=(int) $cellValue;
-                            if (empty($realmoney)) continue;
-                            $correction=$xlsx->nextCell($cell)->getValue();
-                            $consider=$xlsx->prevCell($cell)->getValue();
-                            DB\BalanceCheck::insert_checkpoint($date->format('Y-m-d'),$consider,$realmoney,$correction);
+                        case DB\XlsxColumn::TYPE_CHECKPOINT:
+                            $realmoney=$cell->getOldCalculatedValue();
+                            $columnCell=$cell->getColumn();
+                            $rowCell=$cell->getRow();
+                            $correction=$xlsx->nextCell($columnCell,$rowCell)->getOldCalculatedValue();
+                            $consider=$xlsx->prevCell($columnCell,$rowCell)->getOldCalculatedValue();
+                            DB\BalanceCheck::insertCheckpoint($date->format('Y-m-d'),$consider,$realmoney,$correction);
+                            break;
+                        default:
+                            throw new \Exception("Undefined column");
                             break;
                     }
                 }
             }
 
             // ------------------
-            $date->setDate($fin->year,$fin->month,$max_day);
-            $correctionCell=$sheet->getCell($xlsx->correctionColumn($pColumns).$xlsx->dayRow($max_day));
-            $correctionCellValue=$correctionCell->getValue();
-            if(is_int($correctionCellValue)){
+            $date->setDate($fin->year,$fin->month,$maxDay);
+            $correctionCellValue=$sheet->getCell('Y'.($zeroDayRow+$maxDay))->getOldCalculatedValue();
+            if(!empty($correctionCellValue) || is_int($correctionCellValue)){
                 DB\Record::setCorrection($date->format('Y-m-d'),$correctionCellValue);
-                if(((int)$date->format('U'))<time()){
-
-                    current($fin)==end($fin);
-                    $date->modify('+1 day');
-                    $this->actionGenerateMonthTmpl($date->format('Y'),$date->format('m'));
-                }
-            }elseif(empty($correctionCellValue)){
+            }else{
                 DB\Record::deleteCorrection($date->format('Y-m-d'));
             }
-
             // -----------
         }
 
+        /*
+        if(((int)$date->format('U'))<time()){
+            $date->modify('+1 day');
+            $this->actionGenerateMonthTmpl($date->format('Y'),$date->format('m'));
+        }
+        */
+
+    }
+
+    public function actionBalanceCheck(){
+
+        $points=DB\BalanceCheck::find()->orderBy(['date'=>SORT_ASC])->all();
+        $pointStart=array_shift($points);
+        $totalSum=$pointStart->real;
+        foreach($points as $pointEnd){
+            $sum=DB\Record::find()->select(['sum'=>'sum([[sum]])'])
+                ->where(['>','date',$pointStart->date])
+                ->andWhere(['<=','date',$pointEnd->date])
+                ->scalar();
+            $totalSum+=$sum;
+            list($y,$m,$d)=explode('-',$pointEnd->date);
+            $maxday=date('d',mktime(0,0,0,$m+1,0,$y));
+
+            $mustBe= ( $d==$maxday )
+                ? $pointEnd->consider+$pointEnd->difference
+                : $pointEnd->consider;
+
+            if ($totalSum!=$mustBe)
+                throw new \Exception("{$pointEnd->date}: sum in calculation: {$totalSum} Must be: {$mustBe} false\n");
+            $pointStart=$pointEnd;
+
+        }
+        echo 'balance ok'."\n";
     }
 
 
@@ -204,6 +237,23 @@ class Wallet2016Controller extends \yii\console\Controller
 
         if(is_null($dbxClient->getFile($file_path,fopen($output.'.tmp','w+')))) {
             $result = $dbxClient->uploadFile($file_path, dbx\WriteMode::add(), fopen($output,'rb'));
+        }
+    }
+
+    public function actionGenerateDbxFinanceTbl(){
+        $startYear=2016;
+        $startMonth=1;
+        $currentYear=(int)date('Y');
+        $currentMonth=(int)date('m');
+        for($i=$startYear;$i<=$currentYear;$i++){
+            $j= ($i==$startYear) ? $startMonth : 1;
+            $jmax = ($i==$currentYear)? $currentMonth : 12;
+            for(;$j<=$jmax;$j++){
+                if(!DB\DbxFinance::find()->where(['year'=>$i,'month'=>$j])->exists()){
+                    $dbx=new DB\DbxFinance(['year'=>$i,'month'=>$j,'downloaded'=>0]);
+                    $dbx->save();
+                }
+            }
         }
     }
 }

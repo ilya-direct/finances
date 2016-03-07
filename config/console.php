@@ -31,6 +31,7 @@ return [
             ],
         ],
         'db' => $db,
+        'dbFin2016'=> require(__DIR__ . '/dbFin2016.php'),
     ],
     'params' => $params,
 ];
