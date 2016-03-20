@@ -36,6 +36,15 @@ class TransactionCategory extends \yii\db\ActiveRecord
         return 'transaction_category';
     }
 
+
+    /**
+     * @return \yii\db\Connection the database connection used by this AR class.
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('dbFin2014');
+    }
+
     /**
      * @inheritdoc
      */

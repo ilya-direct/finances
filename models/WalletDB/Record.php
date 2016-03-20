@@ -23,6 +23,15 @@ class Record extends \yii\db\ActiveRecord
         return 'record';
     }
 
+
+    /**
+     * @return \yii\db\Connection the database connection used by this AR class.
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('dbFin2014');
+    }
+
     /**
      * @inheritdoc
      */

@@ -22,6 +22,15 @@ class Item extends \yii\db\ActiveRecord
         return 'item';
     }
 
+
+    /**
+     * @return \yii\db\Connection the database connection used by this AR class.
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('dbFin2014');
+    }
+
     /**
      * @inheritdoc
      */
@@ -29,7 +38,6 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['correct_item_name_id'], 'integer'],
             [['name'], 'string', 'max' => 55],
             [['name'], 'unique']
         ];
@@ -43,27 +51,26 @@ class Item extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'correct_item_name_id' => 'Correct Item Name ID',
         ];
     }
 
 
-	public function getRecords()
-	{
-		return $this->hasMany(Record::className(), ['itemid' => 'id']);
-	}
+    public function getRecords()
+    {
+        return $this->hasMany(Record::className(), ['itemid' => 'id']);
+    }
 
 
 
-	static public function get_item_id($item_name){
-		$item=trim($item_name);
-		if(empty($item))
-			throw new \Exception('Не допускается пустое имя у элемента!');
-		$item_obj=self::findOne(['name'=>$item]);
-		if(is_null($item_obj)){
-			$item_obj = new self(['name' => $item]);
-			$item_obj->save();
-		}
-		return $item_obj->id;
-	}
+    static public function get_item_id($item_name){
+        $item=trim($item_name);
+        if(empty($item))
+            throw new \Exception('Не допускается пустое имя у элемента!');
+        $item_obj=self::findOne(['name'=>$item]);
+        if(is_null($item_obj)){
+            $item_obj = new self(['name' => $item]);
+            $item_obj->save();
+        }
+        return $item_obj->id;
+    }
 }

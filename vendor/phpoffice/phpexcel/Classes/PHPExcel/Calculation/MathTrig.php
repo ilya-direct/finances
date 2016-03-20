@@ -1373,38 +1373,4 @@ class PHPExcel_Calculation_MathTrig {
 		return (intval($value * $adjust)) / $adjust;
 	}	//	function TRUNC()
 
-
-	/**
-	 * COUNTPARTS
-	 *
-	 * COUNTPARTS computes the sum of all the values searated by "|" .
-	 *
-	 * Excel Function:
-	 *		COUNTPARTS(value1)
-	 *
-	 * @access	public
-	 * @category Mathematical and Trigonometric Functions
-	 * @param	string
-	 * @return	int
-	 */
-	public static function COUNTPARTS($arg) {
-		$cells=PHPExcel_Calculation_Functions::flattenArray($arg);
-		// Return value
-		$returnValue = 0;
-
-		foreach ($cells as $cell) {
-			if(is_null($cell)) continue;
-			// Is it a numeric value?
-			$parts=explode('|',$cell);
-			foreach($parts as $p){
-				if ((is_numeric($p))) {
-					$returnValue += $p;
-				}
-			}
-		}
-
-		// Return
-		return $returnValue;
-	} //    function COUNTPARTS()
-
 }	//	class PHPExcel_Calculation_MathTrig

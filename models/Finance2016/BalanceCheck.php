@@ -10,8 +10,9 @@ use Yii;
  * @property integer $id
  * @property string $date
  * @property integer $consider
- * @property integer $realmoney
+ * @property integer $real
  * @property integer $diff
+ * @method static $this findOne(array $condition)
  */
 class BalanceCheck extends \yii\db\ActiveRecord
 {

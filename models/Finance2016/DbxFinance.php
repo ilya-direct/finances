@@ -15,6 +15,8 @@ use Yii;
  * @property boolean $downloaded
  * @property boolean $in_db
  * @property string $file_name
+ *
+ *
  */
 class DbxFinance extends \yii\db\ActiveRecord
 {

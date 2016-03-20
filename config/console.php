@@ -8,7 +8,6 @@ Yii::setAlias('@finance_csv', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'financ
 
 
 $params = require(__DIR__ . '/params.php');
-$db = require(__DIR__ . '/db.php');
 
 return [
     'id' => 'basic-console',
@@ -30,7 +29,7 @@ return [
                 ],
             ],
         ],
-        'db' => $db,
+        'dbFin2014'=> require(__DIR__ . '/dbFin2014.php'),
         'dbFin2016'=> require(__DIR__ . '/dbFin2016.php'),
     ],
     'params' => $params,
