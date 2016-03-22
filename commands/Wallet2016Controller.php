@@ -49,7 +49,7 @@ class Wallet2016Controller extends \yii\console\Controller
                 $rec->in_db = 0;
                 if (!is_null($client->getFile($info['path'], fopen($downloadFilePath, 'wb')))) {
                     $rec->update();
-                    Console::output($yearmonth . 'updated');
+                    Console::output($yearmonth . ' updated');
                 }
             }
         }
@@ -63,7 +63,7 @@ class Wallet2016Controller extends \yii\console\Controller
         if (!is_dir($input_dir))
             throw new \Exception('can\'t find input directory');
 
-        $dateColumn = DB\XlsxColumn::getDateLetter(); //  колонка с датой
+        $dateColumn = DB\Column::getDateLetter(); //  колонка с датой
         $zeroDayRow = Yii::$app->params['headerRow']; // ряд  заголовков в файле
 
         foreach ($fins as $fin) {
@@ -77,7 +77,9 @@ class Wallet2016Controller extends \yii\console\Controller
             // Получаем активный лист
             $sheet = $document->getActiveSheet();
             $xlsx = new ExcelHelper($sheet);
-            $pColumns = DB\XlsxColumn::findAll(['deleted' => 0]);
+            $pColumns = DB\Column::find()
+                ->where(['and', ['is not', 'letter', null], ['deleted' => 0]])
+                ->all();
             $xlsx->checkHeaders($pColumns); // проверка совпадения заголовков в файле с заданными
             $maxDay = date('d', mktime(0, 0, 0, $fin->month + 1, 0, $fin->year)); // максимальный день месяца
 
@@ -85,41 +87,43 @@ class Wallet2016Controller extends \yii\console\Controller
             for ($current_day = 1; $current_day <= $maxDay; $current_day++) {
                 $currentRow = $zeroDayRow + $current_day;
                 $date->setDate($fin->year, $fin->month, $current_day);
-                $dateValue = $xlsx->getCellValue($dateColumn, $currentRow);
+                $dateValue = ExcelHelper::cellValue($xlsx->getCell($dateColumn, $currentRow));
 
                 if ($dateValue !== $date->format('d.m.Y')) {
                     throw new \Exception('Date ' . $date->format('d.m.Y') . ' is different from file date  ' . $dateValue . ' in ' . $input_filepath);
                 }
 
                 foreach ($pColumns as $column) {
-                    if ($column->type == DB\XlsxColumn::TYPE_DATE)
+                    if ($column->column_type_id == DB\Column::TYPE_DATE)
                         continue;
                     $cell = $xlsx->getCell($column->letter, $currentRow);
-                    $cellValue = $cell->getFormattedValue();
+                    $cellValue = ExcelHelper::cellValue($cell);
                     if (empty($cellValue)) { // пустая строка
                         DB\Record::clearDb($date->format('Y-m-d'), $column);
                         continue;
                     }
-                    switch ($column->type) {
-                        case DB\XlsxColumn::TYPE_SINGLE:
+                    switch ($column->column_type_id) {
+                        case DB\Column::TYPE_SINGLE:
                             DB\Record::insertSingle($date, $column, $cellValue);
                             break;
-                        case DB\XlsxColumn::TYPE_MULTIPLE:
+                        case DB\Column::TYPE_MULTIPLE:
                             $columnCell = $cell->getColumn();
                             $rowCell = $cell->getRow();
-                            $descValue = $xlsx->nextCell($columnCell, $rowCell)->getValue();
+                            $descValue = ExcelHelper::cellValue($xlsx->nextCell($columnCell, $rowCell));
                             DB\Record::insertMultiple($date->format('Y-m-d'), $column, $cellValue, $descValue);
                             break;
-                        case DB\XlsxColumn::TYPE_NOTE:
+                        case DB\Column::TYPE_NOTE:
                             DB\Note::insertNote($date->format('Y-m-d'), $cellValue);
                             break;
-                        case DB\XlsxColumn::TYPE_CHECKPOINT:
-                            $realmoney = $cell->getOldCalculatedValue();
+                        case DB\Column::TYPE_CHECKPOINT:
+                            $realmoney = ExcelHelper::cellValue($cell);
                             $columnCell = $cell->getColumn();
                             $rowCell = $cell->getRow();
-                            $correction = $xlsx->nextCell($columnCell, $rowCell)->getOldCalculatedValue();
-                            $consider = $xlsx->prevCell($columnCell, $rowCell)->getOldCalculatedValue();
+                            $correction = ExcelHelper::cellValue($xlsx->nextCell($columnCell, $rowCell));
+                            $consider = ExcelHelper::cellValue($xlsx->prevCell($columnCell, $rowCell));
                             DB\BalanceCheck::insertCheckpoint($date->format('Y-m-d'), $consider, $realmoney, $correction);
+                            break;
+                        case DB\Column::TYPE_CORRECTING:
                             break;
                         default:
                             throw new \Exception("Undefined column");
@@ -130,7 +134,7 @@ class Wallet2016Controller extends \yii\console\Controller
 
             // ------------------
             $date->setDate($fin->year, $fin->month, $maxDay);
-            $correctionCellValue = $sheet->getCell('Y' . ($zeroDayRow + $maxDay))->getOldCalculatedValue();
+            $correctionCellValue = ExcelHelper::cellValue($sheet->getCell('Y' . ($zeroDayRow + $maxDay)));
             if (!empty($correctionCellValue) || is_int($correctionCellValue)) {
                 DB\Record::setCorrection($date->format('Y-m-d'), $correctionCellValue);
             } else {
@@ -139,7 +143,7 @@ class Wallet2016Controller extends \yii\console\Controller
             // -----------
             $fin->in_db = true;
             if ($fin->save()) {
-                Console::output($fin->year . '.' . $fin->month . 'imported to db');
+                Console::output($fin->year . '.' . $fin->month . ' imported to db');
             } else {
                 throw new \Exception($fin->year . ' ' . $fin->month . " cannot update dbxFinance record\n");
             }
@@ -157,20 +161,25 @@ class Wallet2016Controller extends \yii\console\Controller
 
     public function actionBalanceCheck()
     {
-
         $points = DB\BalanceCheck::find()->orderBy(['date' => SORT_ASC])->all();
         $pointStart = array_shift($points);
         $totalSum = $pointStart->real;
         foreach ($points as $pointEnd) {
-            $sum = DB\Record::find()->select(['sum' => 'sum([[sum]])'])->where(['>', 'date', $pointStart->date])->andWhere(['<=', 'date', $pointEnd->date])->scalar();
+            Console::output($pointEnd->date);
+            $sum = DB\Record::find()
+                ->select(['sum' => 'sum([[sum]])'])
+                ->where(['>', 'date', $pointStart->date])
+                ->andWhere(['<=', 'date', $pointEnd->date])
+                ->scalar();
             $totalSum += $sum;
             list($y, $m, $d) = explode('-', $pointEnd->date);
             $maxday = date('d', mktime(0, 0, 0, $m + 1, 0, $y));
 
             $mustBe = ($d == $maxday) ? $pointEnd->consider + $pointEnd->difference : $pointEnd->consider;
 
-            if ($totalSum != $mustBe)
+            if ($totalSum != $mustBe) {
                 throw new \Exception("{$pointEnd->date}: sum in calculation: {$totalSum} Must be: {$mustBe} false\n");
+            }
             $pointStart = $pointEnd;
 
         }

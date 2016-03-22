@@ -61,7 +61,7 @@ class Item extends \yii\db\ActiveRecord
         return $this->hasMany(Record::className(), ['item_id' => 'id']);
     }
 
-    static public function getItemid($name){
+    static public function getItemId($name){
         $name=trim($name);
         if(empty($name)){
             throw new \Exception('Cannot create item with empty name');

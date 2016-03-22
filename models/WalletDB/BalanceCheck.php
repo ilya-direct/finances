@@ -11,7 +11,7 @@ use Yii;
  * @property string $date
  * @property integer $consider
  * @property integer $realmoney
- * @property integer $diff
+ * @property integer $difference
  */
 class BalanceCheck extends \yii\db\ActiveRecord
 {
@@ -39,8 +39,8 @@ class BalanceCheck extends \yii\db\ActiveRecord
     {
         return [
             [['date'], 'safe'],
-            [['consider', 'diff'], 'required'],
-            [['consider', 'realmoney', 'diff'], 'integer'],
+            [['consider', 'difference'], 'required'],
+            [['consider', 'realmoney', 'difference'], 'integer'],
             [['date'], 'unique']
         ];
     }
@@ -55,7 +55,7 @@ class BalanceCheck extends \yii\db\ActiveRecord
             'date' => 'Date',
             'consider' => 'Consider',
             'realmoney' => 'Realmoney',
-            'diff' => 'Diff',
+            'difference' => 'Difference',
         ];
     }
 }

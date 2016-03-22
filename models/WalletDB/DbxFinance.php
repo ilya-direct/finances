@@ -13,7 +13,7 @@ use Yii;
  * @property string $file_name
  * @property string $modified_time
  * @property string $download_time
- * @property integer $exists
+ * @property integer $downloaded
  * @property integer $csv_converted
  * @property integer $in_db
  */
@@ -42,7 +42,7 @@ class DbxFinance extends \yii\db\ActiveRecord
     {
         return [
             [['month', 'year'], 'required'],
-            [['month', 'exists', 'csv_converted', 'in_db'], 'integer'],
+            [['month', 'downloaded', 'csv_converted', 'in_db'], 'integer'],
             [['year', 'modified_time', 'download_time'], 'safe'],
             [['file_name'], 'string', 'max' => 65],
             [['month', 'year'], 'unique', 'targetAttribute' => ['month', 'year'], 'message' => 'The combination of Month and Year has already been taken.']
@@ -61,7 +61,7 @@ class DbxFinance extends \yii\db\ActiveRecord
             'file_name' => 'File Name',
             'modified_time' => 'Modified Time',
             'download_time' => 'Download Time',
-            'exists' => 'Exists',
+            'downloaded' => 'Downloaded',
             'csv_converted' => 'Csv Converted',
             'in_db' => 'In Db',
         ];

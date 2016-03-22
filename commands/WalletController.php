@@ -3,7 +3,7 @@
 namespace app\commands;
 use \Dropbox as dbx;
 use Yii;
-use app\models\WalletDB as DB;
+use app\models\Finance2016 as DB;
 use yii\helpers\Console;
 
 class WalletController extends \yii\console\Controller
@@ -47,11 +47,11 @@ class WalletController extends \yii\console\Controller
 
             $download_filename=$download_path.DIRECTORY_SEPARATOR.$yearmonth.'.xlsm';
             $info['modified']=dbx\Client::parseDateTime($info['modified'])->format("Y-m-d H:i:s");
-            if($info['modified']>$rec->modified_time || $rec->exists==0){
-                $rec->download_time=date('Y-m-d H:i:s');
+            if($info['modified']>$rec->modified_time || $rec->downloaded==0){
+                $rec->downloaded_time=date('Y-m-d H:i:s');
                 $rec->modified_time=$info['modified'];
                 $rec->file_name=$info['path'];
-                $rec->exists=1;
+                $rec->downloaded=1;
                 $rec->in_db=0;
                 $rec->csv_converted=0;
                 if(!is_null($client->getFile($info['path'],fopen($download_filename,'wb')))){
@@ -74,7 +74,7 @@ class WalletController extends \yii\console\Controller
 
 
         $recs=DB\DbxFinance::find()
-            ->where(['exists'=>1,'csv_converted'=>0])
+            ->where(['downloaded'=>1,'csv_converted'=>0])
             ->andWhere(['<=','year',2015])
             ->orderBy(['year'=> SORT_ASC,'month'=>SORT_ASC])->all();
         foreach($recs as $rec){
@@ -138,7 +138,7 @@ class WalletController extends \yii\console\Controller
         function fix_headers(array &$headers){
             for($i=0; $i<count($headers); $i++){
                 // TODO: оптимизировать (выборка одного поля из DB с возвращением строкой или null)
-                $field_name_obj=(DB\TransactionCategory::find()->select('name')->where(['value'=>$headers[$i]])->one());
+                $field_name_obj=(DB\Column::find()->select('name')->where(['value'=>$headers[$i]])->one());
                 if(!is_null($field_name_obj)){
                     $field_name=$field_name_obj->name;
                     $field_array=explode('_',$field_name);
@@ -199,7 +199,7 @@ class WalletController extends \yii\console\Controller
             throw new \Exception('can\'t find input directory in csv2db.php');
 
         $recs=DB\DbxFinance::find()
-            ->where(['exists'=>1,'csv_converted'=>1,'in_db'=>0])
+            ->where(['downloaded'=>1,'csv_converted'=>1,'in_db'=>0])
             ->andWhere(['<=','year',2015])
             ->orderBy(['year'=> SORT_ASC,'month'=> SORT_ASC])->all();
 
@@ -254,15 +254,15 @@ class WalletController extends \yii\console\Controller
                                 $balance_check->attributes=[
                                     'date'=>$date,
                                     'consider'=>$data[array_search('countmoney',$headers)],
-                                    'realmoney'=>$data[$i],
-                                    'diff'=>$data[array_search('difference',$headers)]
+                                    'real'=>$data[$i],
+                                    'difference'=>$data[array_search('difference',$headers)]
                                 ];
                                 $balance_check->save();
                                 unset($balance_check);
                             }
 
                             if($current_day==$maxday){
-                                $correcting_id=DB\Item::get_item_id("Корректировка");
+                                $correcting_id=DB\Item::getItemId("Корректировка");
                                 if(empty($data[$i])){
                                     DB\Record::deleteAll(['date'=>$date,'itemid'=>$correcting_id]);
                                 }else{
@@ -273,12 +273,10 @@ class WalletController extends \yii\console\Controller
                         continue;
                     }
                     if(empty($data[$i])){
-                        //TODO: сделать одним запросом
-                        $tcategories=DB\TransactionCategory::find()->select('id')->where(['name'=>$headers[$i]])->all();
-                        $tcategories=array_map(function($tc){ return $tc->id;},$tcategories);
+                        $tcategories=DB\Column::find()->select('id')->where(['name'=>$headers[$i]])->column();
                         //TODO: сделать более безопасное удаление !!
                         if(!empty($tcategories))
-                            DB\Record::deleteAll('date="'.$date.'" and tcategory in ('.implode(',',$tcategories).')');
+                            DB\Record::deleteAll(['date'=>$date,'column_id'=>$tcategories]);
                         unset($tcategories);
                         continue;
                     }
@@ -337,7 +335,7 @@ class WalletController extends \yii\console\Controller
 
         // Удаление названий транзакций, на которых нет ссылки в тбл record
         //TODO: оптимизировать
-        $item_ids=DB\Record::find()->select('itemid')->distinct();
+        $item_ids=DB\Record::find()->select('item_id')->distinct();
         if(!empty($item_ids))
             DB\Item::deleteAll(['not in','id',$item_ids]);
     }
@@ -348,12 +346,13 @@ class WalletController extends \yii\console\Controller
             if ($actual!=$mustbe)
                 throw new \Exception("$date Sum in calculation: $actual Must be: {$mustbe} false\n");
         }
-        if(!DB\BalanceCheck::find()->where('year(date)=2013')->exists())
+//        if(!DB\BalanceCheck::find()->where('year(date)=2013')->exists()) // for MySql
+        if(!DB\BalanceCheck::find()->where('extract(year from [[date]])=2013')->exists())
             throw new \Exception('not initialized with script init');
 
         $points=DB\BalanceCheck::find()->orderBy('date')->all();
         $point_1=array_shift($points);
-        $total_sum=$point_1->consider;
+        $total_sum=$point_1->real;
         foreach($points as $point_2){
             $sum=DB\Record::find()->select(['sum(sum) as sum'])
                 ->where(['>','date',$point_1->date])
@@ -362,7 +361,7 @@ class WalletController extends \yii\console\Controller
             list($y,$m,$d)=explode('-',$point_2->date);
             $maxday=date('d',mktime(0,0,0,$m+1,0,$y));
             if ($d==$maxday){
-                compare_values($total_sum,$point_2->consider+$point_2->diff,$point_2->date);
+                compare_values($total_sum,$point_2->consider+$point_2->difference,$point_2->date);
             }else
                 compare_values($total_sum,$point_2->consider,$point_2->date);
             $point_1=$point_2;
@@ -384,7 +383,7 @@ class WalletController extends \yii\console\Controller
             $jmax=($i==$current_year)? $current_month : 12;
             for(;$j<=$jmax;$j++){
                 if(!DB\DbxFinance::find()->where(['year'=>$i,'month'=>$j])->exists()){
-                    $dbx=new DB\DbxFinance(['year'=>$i,'month'=>$j,'exists'=>0]);
+                    $dbx=new DB\DbxFinance(['year'=>$i,'month'=>$j,'downloaded'=>0]);
                     $dbx->save();
                 }
             }
@@ -393,19 +392,19 @@ class WalletController extends \yii\console\Controller
 
     public function actionGen_tcategory(){
         $fields=[
-            'Мама'=>            ['name'=>'p_mom_multiple','sort'=>2],
-            'Мама (PM)'=>       ['name'=>'p_mompm','sort'=>3],
-            'Ученики'=>         ['name'=>'p_pupils','sort'=>4],
-            'Другие доходы'=>   ['name'=>'p_other_multiple','sort'=>5],
-            'Универ'=>          ['name'=>'m_university','sort'=>6],
-            'MTI'=>             ['name'=>'m_mti','sort'=>7],
-            'бенз'=>            ['name'=>'m_petrol','sort'=>8],
-            'Моб'=>             ['name'=>'m_mobile','sort'=>8,'deleted'=>1],
-            'Мобила'=>          ['name'=>'m_mobile','sort'=>9],
-            'iPad'=>            ['name'=>'m_ipad','sort'=>10],
-            'Гулянки'=>         ['name'=>'m_spend_multiple','sort'=>11],
-            'Другие расходы'=>  ['name'=>'m_other_multiple','sort'=>12],
-            'Корректировка'=>   ['name'=>'correcting','sort'=>13]
+            'Мама'=>            ['name'=>'p_mom_multiple'],
+            'Мама (PM)'=>       ['name'=>'p_mompm'],
+            'Ученики'=>         ['name'=>'p_pupils'],
+            'Другие доходы'=>   ['name'=>'p_other_multiple'],
+            'Универ'=>          ['name'=>'m_university'],
+            'MTI'=>             ['name'=>'m_mti'],
+            'бенз'=>            ['name'=>'m_petrol'],
+            'Моб'=>             ['name'=>'m_mobile','deleted'=>1],
+            'Мобила'=>          ['name'=>'m_mobile'],
+            'iPad'=>            ['name'=>'m_ipad'],
+            'Гулянки'=>         ['name'=>'m_spend_multiple'],
+            'Другие расходы'=>  ['name'=>'m_other_multiple'],
+            'Корректировка'=>   ['name'=>'correcting']
         ];
 
         foreach($fields as $value => $params){
@@ -414,25 +413,17 @@ class WalletController extends \yii\console\Controller
                 unset($matches);
             }
             //TODO: есть ли функция найтиИлиСоздать, чтобы две строчки ниже сделать одной
-            $tc=DB\TransactionCategory::find()->where(['value'=>$value])->one();
-            $tc=is_object($tc) ? $tc : new DB\TransactionCategory(['value'=>$value]);
+            $tc=DB\Column::find()->where(['value'=>$value])->one();
+            $tc=is_object($tc) ? $tc : new DB\Column(['value'=>$value]);
             $tc->attributes=$params;
             $tc->save();
         }
     }
 
     public function actionInit(){
-        $init_params=[
-            'date'=>'2013-12-31',
-            'realmoney'=>15114,
-            'consider'=>15114,'diff'=>0
-        ];
-        if(!DB\BalanceCheck::find()->where($init_params)->exists()){
-            $bc=new DB\BalanceCheck($init_params);
-            $bc->save();
-        }
+
         $this->actionGen_dbx_finance_tbl();
-        $this->actionGen_tcategory();
+       // $this->actionGen_tcategory();
     }
 
     private function uploadToDropbox($ffrom,$fto,$mode=null){

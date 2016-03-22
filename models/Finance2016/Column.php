@@ -5,15 +5,17 @@ namespace app\models\Finance2016;
 use Yii;
 
 /**
- * This is the model class for table "xlsx_column".
- *
+ * This is the model class for table "column".
  * @property integer $id
- * @property integer $type
+ * @property integer $column_type_id
  * @property string $letter
  * @property integer $sign
+ * @property integer $name
  * @property string $value
+ * @property string $zero_sum
+ * @property string $deleteds
  */
-class XlsxColumn extends \yii\db\ActiveRecord
+class Column extends \yii\db\ActiveRecord
 {
 
     const TYPE_SINGLE = 1;
@@ -21,12 +23,13 @@ class XlsxColumn extends \yii\db\ActiveRecord
     const TYPE_NOTE = 3;
     const TYPE_CHECKPOINT = 4;
     const TYPE_DATE = 5;
+    const TYPE_CORRECTING = 6;
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'xlsx_column';
+        return 'column';
     }
 
     /**
