@@ -28,4 +28,4 @@ phpunit.phar
 /phpunit.xml
 
 /temp
-/www/assets/
+/www/assets/*
