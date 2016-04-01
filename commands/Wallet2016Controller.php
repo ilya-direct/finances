@@ -193,11 +193,13 @@ class Wallet2016Controller extends \yii\console\Controller
         $month = (int) (empty((int) $month) ? date('m') : $month);
         $monthstr = sprintf("%02d", $month);
 
-        $file_path = '/finances/' . $year . '.' . $monthstr . '.xlsx';
-        $output = Yii::getAlias('@temp/' . $year . '.' . $monthstr . '.xlsx');
+        $file_path = '/finances/' . $year . '.' . $monthstr . '.xlsm';
+        $output = Yii::getAlias('@temp/' . $year . '.' . $monthstr . '.xlsm');
         $dbxClient = new  dbx\Client(Yii::$app->params['dbx_token'], 'directapp', 'UTF-8');
-        if (!is_null($dbxClient->getFile($file_path, fopen($output . '.tmp', 'w+'))))
+        if (!is_null($dbxClient->getFile($file_path, $h = fopen($output . '.tmp', 'w+')))){
+            fclose($h);
             return;
+        }
 
         $date = new \DateTime("$year-$month-1");
         $date->sub(new \DateInterval('P1D'));
@@ -206,7 +208,7 @@ class Wallet2016Controller extends \yii\console\Controller
         $start_sum = is_object($bc) ? $bc->real : $start_sum = "";
         unset($bc);
 
-        $path = Yii::getAlias('@templates/month_template_2016.xlsx');
+        $path = Yii::getAlias('@templates/month_template_2016.xlsm');
         // Открываем файл
         $xlsx = \PHPExcel_IOFactory::load($path);
         // Устанавливаем индекс активного листа
@@ -244,7 +246,7 @@ class Wallet2016Controller extends \yii\console\Controller
         $objWriter->save($output);
 
         if (is_null($dbxClient->getFile($file_path, fopen($output . '.tmp', 'w+')))) {
-            $result = $dbxClient->uploadFile($file_path, dbx\WriteMode::add(), fopen($output, 'rb'));
+            $dbxClient->uploadFile($file_path, dbx\WriteMode::add(), fopen($output, 'rb'));
         }
     }
 
