@@ -9,6 +9,7 @@ use Yii;
  *
  * @property integer $id
  * @property integer $month
+ * @property string $monthStr
  * @property integer $year
  * @property string $modified_time
  * @property string $downloaded_time

@@ -11,8 +11,8 @@ use Yii;
  * @property string $date
  * @property integer $consider
  * @property integer $real
- * @property integer $diff
- * @method static $this findOne(array $condition)
+ * @property integer $difference
+ *
  */
 class BalanceCheck extends \yii\db\ActiveRecord
 {

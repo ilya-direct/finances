@@ -3,7 +3,7 @@
 namespace app\models\Finance2016;
 
 use Yii;
-use yii\helpers\Console;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "record".
@@ -122,23 +122,23 @@ class Record extends Yii\db\ActiveRecord
      * @param $column \app\models\Finance2016\Column
      * @throws \Exception
      */
-
-    static function clearDb($date,$column){
-        switch($column->column_type_id){
+    static function clearDb($date, $column)
+    {
+        switch ($column->column_type_id) {
             case Column::TYPE_SINGLE:
             case Column::TYPE_MULTIPLE:
-                Record::deleteAll(['date'=>$date,'column_id'=>$column->id]);
+                Record::deleteAll(['date' => $date, 'column_id' => $column->id]);
                 break;
             case Column::TYPE_NOTE:
-                Note::deleteAll(['date'=>$date]);
+                Note::deleteAll(['date' => $date]);
                 break;
             case Column::TYPE_CHECKPOINT:
-                BalanceCheck::deleteAll(['date'=>$date]);
+                BalanceCheck::deleteAll(['date' => $date]);
                 break;
             case Column::TYPE_CORRECTING:
-                 break;
+                break;
             default:
-                throw new \Exception("Undefined type for deletion");
+                throw new Exception("Undefined type for deletion");
                 break;
         }
     }
