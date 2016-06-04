@@ -179,13 +179,13 @@ class Wallet2016Controller extends Controller
 
     public function actionBalanceCheck()
     {
+        Console::output('Checking balance ...');
         /** @var DB\BalanceCheck[] $points */
         $points = DB\BalanceCheck::find()->orderBy(['date' => SORT_ASC])->all();
         /** @var DB\BalanceCheck $pointStart */
         $pointStart = array_shift($points);
         $totalSum = $pointStart->real;
         foreach ($points as $pointEnd) {
-            Console::output($pointEnd->date);
             $sum = DB\Record::find()
                 ->select(['sum' => 'sum([[sum]])'])
                 ->where(['>', 'date', $pointStart->date])
@@ -204,7 +204,10 @@ class Wallet2016Controller extends Controller
             }
             $pointStart = $pointEnd;
         }
-        Console::output('balance ok');
+        /** @var DB\BalanceCheck $lastPoint */
+        $lastPoint = end($points);
+        Console::output('Last check-point at: ' . ($lastPoint ? $lastPoint->date : 'no check-points found'));
+        Console::output('Balance ok');
     }
 
 
@@ -229,6 +232,9 @@ class Wallet2016Controller extends Controller
             ->select('real')
             ->where(['date' => $date->format('Y-m-d')])
             ->scalar();
+        if (!$startSum) {
+            $startSum = 0;
+        }
 
         $path = Yii::getAlias('@templates/month_template_2016.xlsm');
         // Открываем файл
@@ -297,8 +303,17 @@ class Wallet2016Controller extends Controller
                 if (!DB\DbxFinance::find()->where(['year' => $i, 'month' => $j])->exists()) {
                     $dbx = new DB\DbxFinance(['year' => $i, 'month' => $j, 'downloaded' => 0]);
                     $dbx->save();
+                    Console::output('New month added : ' . $i . '.' . $j);
                 }
             }
         }
+    }
+
+    public function actionPerDay()
+    {
+        $this->actionGenerateDbxFinanceTbl();
+        $this->actionDbxDownload();
+        $this->actionParseXlsx();
+        $this->actionBalanceCheck();
     }
 }
