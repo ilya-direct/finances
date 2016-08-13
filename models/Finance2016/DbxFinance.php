@@ -69,7 +69,8 @@ class DbxFinance extends \yii\db\ActiveRecord
     }
 
 
-    public function getMonthStr(){
-        return str_replace(' ','0',\sprintf('%2.d', $this->month));
+    public function getMonthStr()
+    {
+        return sprintf('%02d', $this->month);
     }
 }

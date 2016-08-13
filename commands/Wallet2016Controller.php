@@ -20,10 +20,12 @@ class Wallet2016Controller extends Controller
 
     public function actionDbxDownload()
     {
+        Console::output('Downloading files from dropbox ...');
         $client = new  dbx\Client(Yii::$app->params['dbx_token'], 'directapp', 'UTF-8');
         $downloadPath = Yii::getAlias('@finance_download_path');
+
         if (!is_dir($downloadPath) and !mkdir($downloadPath, 0777, true)) {
-            throw new \Exception('can\'t open download directory');
+            throw new Exception('Cannot create downloading directory');
         }
 
         $finances = $client->getMetadataWithChildren('/finances')['contents'];
@@ -45,7 +47,7 @@ class Wallet2016Controller extends Controller
             $info = isset($files[$yearMonth]) ? $files[$yearMonth] : false;
 
             if (!$info) {
-                throw new Exception('not found file ' . $yearMonth);
+                throw new Exception('Cannot found file ' . $yearMonth . '.xlsm in dropbox');
             }
 
             $downloadFilePath = $downloadPath . '/' . $yearMonth . '.xlsm';
@@ -59,7 +61,7 @@ class Wallet2016Controller extends Controller
                 $rec->in_db = 0;
                 if (!is_null($client->getFile($info['path'], fopen($downloadFilePath, 'wb')))) {
                     $rec->update();
-                    Console::output($yearMonth . ' ' . $action);
+                    Console::output($yearMonth . ' ' . $action . ' from dropbox');
                 }
             }
         }
@@ -68,6 +70,7 @@ class Wallet2016Controller extends Controller
 
     public function actionParseXlsx()
     {
+        Console::output('Parsing downloaded files ...');
         /** @var DB\DbxFinance[] $fins */
         $fins = DB\DbxFinance::find()
             ->where(['>=', 'year', 2016])
@@ -78,7 +81,7 @@ class Wallet2016Controller extends Controller
             ])->all();
         $inputDir = Yii::getAlias('@finance_download_path');
         if (!is_dir($inputDir)) {
-            throw new Exception('can\'t find input directory');
+            throw new Exception('Cannot find input directory');
         }
 
         $dateColumn = DB\Column::getDateLetter(); //  колонка с датой
@@ -88,17 +91,17 @@ class Wallet2016Controller extends Controller
             $fileName = $fin->year . '.' . $fin->monthStr . '.xlsm';
             $inputFilePath = $inputDir . '/' . $fileName;
             if (!file_exists($inputFilePath)) {
-                throw new \Exception("file $inputFilePath not found");
+                throw new Exception('File ' . $inputFilePath . ' not found');
             }
             $document = \PHPExcel_IOFactory::load($inputFilePath);
             $document->setActiveSheetIndex(0);
             // Получаем активный лист
             $sheet = $document->getActiveSheet();
             $xlsx = new ExcelHelper($sheet);
+
             /** @var DB\Column[] $headers */
-            $headers = DB\Column::find()
-                ->where(['and', ['is not', 'letter', null], ['deleted' => 0]])
-                ->all();
+            $headers = DB\Column::find()->where(['and', ['not', ['letter' => null]], ['deleted' => 0]])->all();
+
             $xlsx->checkHeaders($headers); // проверка совпадения заголовков в файле с заданными
             $maxDay = date('d', mktime(0, 0, 0, $fin->month + 1, 0, $fin->year)); // максимальный день месяца
 
@@ -152,7 +155,7 @@ class Wallet2016Controller extends Controller
             // ------------------
             $date->setDate($fin->year, $fin->month, $maxDay);
             $correctionCellValue = ExcelHelper::cellValue($sheet->getCell('Y' . ($zeroDayRow + $maxDay)));
-            if (!empty($correctionCellValue) || is_int($correctionCellValue)) {
+            if (is_int($correctionCellValue)) {
                 DB\Record::setCorrection($date->format('Y-m-d'), $correctionCellValue);
             } else {
                 DB\Record::deleteCorrection($date->format('Y-m-d'));
@@ -160,20 +163,10 @@ class Wallet2016Controller extends Controller
             // -----------
 
             $fin->in_db = true;
-            if ($fin->save()) {
-                Console::output($fin->year . '.' . $fin->month . ' imported to db');
-            } else {
-                throw new Exception($fin->year . ' ' . $fin->month . ' cannot update dbxFinance record');
-            }
+            $fin->save(false);
+            Console::output($fin->year . '.' . $fin->monthStr . ' imported to db');
 
         }
-
-        /*
-        if(((int)$date->format('U'))<time()){
-            $date->modify('+1 day');
-            $this->actionGenerateMonthTmpl($date->format('Y'),$date->format('m'));
-        }
-        */
 
     }
 
@@ -213,10 +206,10 @@ class Wallet2016Controller extends Controller
 
     public function actionGenerateMonthTmpl($year = 0, $month = 0)
     {
-        $year = (int)(empty((int)$year) ? date('Y') : $year);
-        $month = (int)(empty((int) $month) ? date('m') : $month);
-        $monthStr = sprintf("%02d", $month);
         Console::stdout('Generating ' . $month . '.' . $year . '.xlsm... ');
+        $year = (int)$year ?: date('Y');
+        $month = (int)$month ?: date('m');
+        $monthStr = sprintf("%02d", $month);
         $filePath = '/finances/' . $year . '.' . $monthStr . '.xlsm';
         $output = Yii::getAlias('@temp/' . $year . '.' . $monthStr . '.xlsm');
         $dbxClient = new  dbx\Client(Yii::$app->params['dbx_token'], 'directapp', 'UTF-8');
@@ -224,20 +217,9 @@ class Wallet2016Controller extends Controller
             Console::output('canceled! Already Exists!');
             return;
         }
-        $date = new DateTime();
-        $date->setDate($year, $month, 1);
-        $date->sub(new \DateInterval('P1D'));
-
-        $startSum = DB\BalanceCheck::find()
-            ->select('real')
-            ->where(['date' => $date->format('Y-m-d')])
-            ->scalar();
-        if (!$startSum) {
-            $startSum = 0;
-        }
 
         $path = Yii::getAlias('@templates/month_template_2016.xlsm');
-        // Открываем файл
+        // Открываем файл шаблона
         $xlsx = \PHPExcel_IOFactory::load($path);
         // Устанавливаем индекс активного листа
         $xlsx->setActiveSheetIndex(0);
@@ -261,6 +243,13 @@ class Wallet2016Controller extends Controller
 
         $sheet->setCellValue('D4', $months[$month] . ' ' . $year);
         // Вставляем Начальную сумму в ячейку F5
+        $date = new DateTime();
+        $date->setDate($year, $month, 1);
+        $date->sub(new \DateInterval('P1D'));
+        $startSum = DB\BalanceCheck::find()
+            ->select('real')
+            ->where(['date' => $date->format('Y-m-d')])
+            ->scalar() ?: 0;
         $sheet->setCellValue('F5', $startSum);
 
         // максимальный день месяца
@@ -270,10 +259,12 @@ class Wallet2016Controller extends Controller
         for ($day = 1; $day <= $maxDay; $day++) {
             $pRow = 8 + $day;
             // Запись даты с D9
-            $sheet->setCellValueByColumnAndRow(3, $pRow, sprintf("%02d", $day) . '.' . $monthStr . '.' . $year);
+            $dateValue = \PHPExcel_Shared_Date::FormattedPHPToExcel($year, $month, $day);
+            $sheet->setCellValueByColumnAndRow(3, $pRow, $dateValue);
             // Запись дня недели в ячейку E9
             $weekday = ($startWeekday + $day - 1) % 7;
             $sheet->setCellValueByColumnAndRow(4, $pRow, $days[$weekday]);
+            // Жирная нижняя граница, если конец недели
             if ($weekday == 0) {
                 //жирная нижняя граница
                 $xlsx->getActiveSheet()
@@ -295,13 +286,14 @@ class Wallet2016Controller extends Controller
     {
         $startYear = 2016;
         $startMonth = 1;
-        $currentYear = (int) date('Y');
-        $currentMonth = (int) date('m');
+        $currentYear = (int)date('Y');
+        $currentMonth = (int)date('m');
         for ($i = $startYear; $i <= $currentYear; $i++) {
             $maxMonth = ($i == $currentYear) ? $currentMonth : 12;
             for ($j = ($i == $startYear) ? $startMonth : 1; $j <= $maxMonth; $j++) {
                 if (!DB\DbxFinance::find()->where(['year' => $i, 'month' => $j])->exists()) {
                     $dbx = new DB\DbxFinance(['year' => $i, 'month' => $j, 'downloaded' => 0]);
+                    $this->actionGenerateMonthTmpl($i, $j);
                     $dbx->save();
                     Console::output('New month added : ' . $i . '.' . $j);
                 }
