@@ -155,7 +155,7 @@ class Wallet2016Controller extends Controller
             // ------------------
             $date->setDate($fin->year, $fin->month, $maxDay);
             $correctionCellValue = ExcelHelper::cellValue($sheet->getCell('Y' . ($zeroDayRow + $maxDay)));
-            if (is_int($correctionCellValue)) {
+            if (!empty($correctionCellValue) || is_int($correctionCellValue)) {
                 DB\Record::setCorrection($date->format('Y-m-d'), $correctionCellValue);
             } else {
                 DB\Record::deleteCorrection($date->format('Y-m-d'));
@@ -193,7 +193,7 @@ class Wallet2016Controller extends Controller
             if ($totalSum != $mustBe) {
                 throw new Exception($pointEnd->date
                     . ': Sum in calculation: ' . $totalSum
-                    . 'Must be: ' . $mustBe . 'false');
+                    . '. Must be: ' . $mustBe);
             }
             $pointStart = $pointEnd;
         }
@@ -295,7 +295,7 @@ class Wallet2016Controller extends Controller
                     $dbx = new DB\DbxFinance(['year' => $i, 'month' => $j, 'downloaded' => 0]);
                     $this->actionGenerateMonthTmpl($i, $j);
                     $dbx->save();
-                    Console::output('New month added : ' . $i . '.' . $j);
+                    Console::output('New month added : ' . sprintf('%02d', $i) . '.' . $j);
                 }
             }
         }
