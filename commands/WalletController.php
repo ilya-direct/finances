@@ -340,7 +340,7 @@ class WalletController extends \yii\console\Controller
             DB\Item::deleteAll(['not in','id',$item_ids]);
     }
 
-    public function actionBalance_check(){
+    public function actionBalanceCheck(){
 
         function compare_values($actual,$mustbe,$date){
             if ($actual!=$mustbe)
@@ -370,7 +370,7 @@ class WalletController extends \yii\console\Controller
         echo 'balance ok'."\n";
     }
 
-    public function actionGen_dbx_finance_tbl(){
+    public function actionGenDbxFinanceTbl(){
         $start_year=2014;
         $start_month=1;
         $current_year=(int)date('Y');
@@ -390,7 +390,7 @@ class WalletController extends \yii\console\Controller
         }
     }
 
-    public function actionGen_tcategory(){
+    public function actionGenTcategory(){
         $fields=[
             'Мама'=>            ['name'=>'p_mom_multiple'],
             'Мама (PM)'=>       ['name'=>'p_mompm'],
@@ -422,7 +422,7 @@ class WalletController extends \yii\console\Controller
 
     public function actionInit(){
 
-        $this->actionGen_dbx_finance_tbl();
+        $this->actionGenDbxFinanceTbl();
        // $this->actionGen_tcategory();
     }
 
@@ -442,12 +442,12 @@ class WalletController extends \yii\console\Controller
             parent::options($actionID),$options);
     }
     public $to_dbx=true;
-    public function actionPer_day(){
+    public function actionPerDay(){
         $start=microtime(true);
         $this->ActionDbxDownload();
         $this->ActionXlsm2csv();
         $this->ActionCsv2db();
-        $this->ActionBalance_check();
+        $this->actionBalanceCheck();
         $time=microtime(true) - $start;
         $status='OK';
         $lastrec=DB\Record::find()->orderBy(['date' => SORT_DESC ])->one();
@@ -462,9 +462,9 @@ class WalletController extends \yii\console\Controller
         echo 'Last record: '.$lastrec->date."\n";
     }
 
-    public function actionPer_month(){
+    public function actionPerMonth(){
         $start=microtime(true);
-        $this->ActionGen_dbx_finance_tbl();
+        $this->actionGenDbxFinanceTbl();
         $time=microtime(true) - $start;
 
         $status='OK';
