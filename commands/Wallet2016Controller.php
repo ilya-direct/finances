@@ -103,6 +103,7 @@ class Wallet2016Controller extends Controller
             $headers = DB\Column::find()->where(['and', ['not', ['letter' => null]], ['deleted' => 0]])->all();
 
             $xlsx->checkHeaders($headers); // проверка совпадения заголовков в файле с заданными
+            // TODO: Заполнение начальной суммы
             $maxDay = date('d', mktime(0, 0, 0, $fin->month + 1, 0, $fin->year)); // максимальный день месяца
 
             $date = new DateTime();
@@ -206,7 +207,7 @@ class Wallet2016Controller extends Controller
 
     public function actionGenerateMonthTmpl($year = 0, $month = 0)
     {
-        Console::stdout('Generating ' . $month . '.' . $year . '.xlsm... ');
+        Console::stdout('Generating ' . sprintf('%02d',$month) . '.' . $year . '.xlsm... ');
         $year = (int)$year ?: date('Y');
         $month = (int)$month ?: date('m');
         $monthStr = sprintf("%02d", $month);
@@ -242,6 +243,7 @@ class Wallet2016Controller extends Controller
         ];
 
         $sheet->setCellValue('D4', $months[$month] . ' ' . $year);
+        
         // Вставляем Начальную сумму в ячейку F5
         $date = new DateTime();
         $date->setDate($year, $month, 1);
