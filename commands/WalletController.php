@@ -2,6 +2,7 @@
 
 namespace app\commands;
 use \Dropbox as dbx;
+use integrations\dropbox\DropboxApi;
 use Yii;
 use app\models\Finance2016 as DB;
 use yii\helpers\Console;
@@ -16,23 +17,24 @@ class WalletController extends \yii\console\Controller
 
     public function actionDbxdownload()
     {
-        $client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
-
         $download_path=Yii::getAlias('@finance_download_path');
 
         //TODO: Заменить is_dir функцией из библиотеки YII
         if(!is_dir($download_path) and !\yii\helpers\FileHelper::createDirectory($download_path,0777,true))
             throw new \Exception('can\'t open download directory');
-
-
-        $finances=$client->getMetadataWithChildren('/finances')['contents'];
+    
+    
+        /** @var DropboxApi $dropbox */
+        $dropbox = Yii::$app->dropbox;
+        
+        $finances = $dropbox->filesListFolder('/finances');
         $recs=DB\DbxFinance::find()
             ->where(['<=','year',2015])
             ->orderBy(['year'=> SORT_ASC,'month' => SORT_ASC])->all();
         // --- функция поиска
         function search_info($pattern,$finances){
             foreach($finances as $fin){
-                if(preg_match('/'.$pattern.'/',$fin['path'])){
+                if(preg_match('/'.$pattern.'/',$fin['path_lower'])){
                     return $fin;
                 }
             }
@@ -46,17 +48,19 @@ class WalletController extends \yii\console\Controller
             if(!$info) throw new \Exception('not found file '. $yearmonth);
 
             $download_filename=$download_path.DIRECTORY_SEPARATOR.$yearmonth.'.xlsm';
-            $info['modified']=dbx\Client::parseDateTime($info['modified'])->format("Y-m-d H:i:s");
+            $info['modified']= $dropbox->parseDateTime($info['server_modified']);
             if($info['modified']>$rec->modified_time || $rec->downloaded==0){
                 $rec->downloaded_time=date('Y-m-d H:i:s');
                 $rec->modified_time=$info['modified'];
-                $rec->file_name=$info['path'];
+                $rec->file_name=$info['path_lower'];
                 $rec->downloaded=1;
                 $rec->in_db=0;
                 $rec->csv_converted=0;
-                if(!is_null($client->getFile($info['path'],fopen($download_filename,'wb')))){
+                if ($dropbox->filesDownload($info['path_lower'], $download_filename)) {
                     $rec->update();
                     echo "$yearmonth updated\n";
+                } else {
+                    echo "$yearmonth NOT updated\n";
                 }
             }
         }
@@ -425,15 +429,7 @@ class WalletController extends \yii\console\Controller
         $this->actionGenDbxFinanceTbl();
        // $this->actionGen_tcategory();
     }
-
-    private function uploadToDropbox($ffrom,$fto,$mode=null){
-        if(is_null($mode)) $mode=dbx\WriteMode::force();
-
-        $client=new  dbx\Client(\Yii::$app->params['dbx_token'],'directapp','UTF-8');
-        $file=fopen($ffrom,'rb');
-        $client->uploadFile($fto,$mode, $file);
-        fclose($file);
-    }
+    
     public function options($actionID){
         $options=[];
         if( in_array($actionID,['per_day','per_month','index']))
@@ -456,9 +452,6 @@ class WalletController extends \yii\console\Controller
             .' last rec in db: '.$lastrec->date."\n");
 
         fclose($file);
-        // upload log file to  dropbox
-        if($this->to_dbx)
-            $this->uploadToDropbox(Yii::getAlias('@temp/records.log'),'/records.log');
         echo 'Last record: '.$lastrec->date."\n";
     }
 
@@ -471,10 +464,6 @@ class WalletController extends \yii\console\Controller
         $file=fopen(Yii::getAlias('@temp/records.log'),'ab+');
         fwrite($file,date('Y-m-d H:i:s').' '.__FUNCTION__.' '.$time.' '.$status."\n");
         fclose($file);
-
-        // upload log file to  dropbox
-        if($this->to_dbx)
-            $this->uploadToDropbox(Yii::getAlias('@temp/records.log'),'/records.log');
     }
 
     public function actionGeneratexlsx($year='',$month=''){

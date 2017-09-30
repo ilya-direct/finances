@@ -20,7 +20,8 @@
         "yiisoft/yii2-swiftmailer": "*",
         "wbraganca/yii2-dynamicform": "*",
         "phpoffice/phpexcel": "~1.8",
-        "dropbox/dropbox-sdk": "^1.1"
+        "dropbox/dropbox-sdk": "^1.1",
+        "linslin/yii2-curl": "^1.2"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

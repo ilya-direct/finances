@@ -5,6 +5,7 @@ Yii::setAlias('@data', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'temp'. DIRECTO
 Yii::setAlias('@templates', dirname(__DIR__) . DIRECTORY_SEPARATOR  . 'templates');
 Yii::setAlias('@finance_download_path', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_download');
 Yii::setAlias('@finance_csv', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_csv');
+Yii::setAlias('@integrations', dirname(__DIR__) . '/integrations');
 
 
 $params = require(__DIR__ . '/params.php');
@@ -28,6 +29,10 @@ return [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'dropbox' => [
+            'class' => \integrations\dropbox\DropboxApi::class,
+            'accessToken' => $params['dbxToken'],
         ],
         'dbFin2014'=> require(__DIR__ . '/dbFin2014.php'),
         'dbFin2016'=> require(__DIR__ . '/dbFin2016.php'),

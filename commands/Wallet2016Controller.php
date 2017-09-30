@@ -2,6 +2,7 @@
 
 namespace app\commands;
 
+use integrations\dropbox\DropboxApi;
 use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
@@ -17,22 +18,31 @@ class Wallet2016Controller extends Controller
     {
         print "Hello " . $nox;
     }
+    
+    private function findFileInfo($dbxEntries, $fileName)
+    {
+        foreach ($dbxEntries as $entry) {
+            if ($entry['name'] === $fileName) {
+                return $entry;
+            }
+        }
+        
+        return false;
+    }
 
     public function actionDbxDownload()
     {
         Console::output('Downloading files from dropbox ...');
-        $client = new  dbx\Client(Yii::$app->params['dbx_token'], 'directapp', 'UTF-8');
         $downloadPath = Yii::getAlias('@finance_download_path');
 
         if (!is_dir($downloadPath) and !mkdir($downloadPath, 0777, true)) {
             throw new Exception('Cannot create downloading directory');
         }
 
-        $finances = $client->getMetadataWithChildren('/finances')['contents'];
-        $files = [];
-        foreach ($finances as $fin) {
-            $files[basename($fin['path'], '.xlsm')] = $fin;
-        }
+        /** @var DropboxApi $dropbox */
+        $dropbox = Yii::$app->dropbox;
+        
+        $finances = $dropbox->filesListFolder('/finances');
 
         /** @var DB\DbxFinance[] $recs */
         $recs = DB\DbxFinance::find()
@@ -44,24 +54,26 @@ class Wallet2016Controller extends Controller
 
         foreach ($recs as $rec) {
             $yearMonth = $rec->year . '.' . $rec->monthStr;
-            $info = isset($files[$yearMonth]) ? $files[$yearMonth] : false;
+            $info = $this->findFileInfo($finances, $yearMonth . '.xlsm');
 
             if (!$info) {
                 throw new Exception('Cannot found file ' . $yearMonth . '.xlsm in dropbox');
             }
 
             $downloadFilePath = $downloadPath . '/' . $yearMonth . '.xlsm';
-            $info['modified'] = dbx\Client::parseDateTime($info['modified'])->format("Y-m-d H:i:s");
+            $info['modified'] = $dropbox->parseDateTime($info['server_modified']);
             if (($info['modified'] > $rec->modified_time) || $rec->downloaded == 0) {
                 $action = $rec->downloaded ? 'updated' : 'downloaded';
                 $rec->downloaded_time = date('Y-m-d H:i:s');
                 $rec->modified_time = $info['modified'];
-                $rec->file_name = $info['path'];
+                $rec->file_name = $info['path_lower'];
                 $rec->downloaded = 1;
                 $rec->in_db = 0;
-                if (!is_null($client->getFile($info['path'], fopen($downloadFilePath, 'wb')))) {
+                if ($dropbox->filesDownload($info['path_lower'], $downloadFilePath)) {
                     $rec->update();
                     Console::output($yearMonth . ' ' . $action . ' from dropbox');
+                } else {
+                    Console::output($yearMonth . ' NOT ' . $action . ' from dropbox');
                 }
             }
         }
@@ -295,7 +307,8 @@ class Wallet2016Controller extends Controller
             for ($j = ($i == $startYear) ? $startMonth : 1; $j <= $maxMonth; $j++) {
                 if (!DB\DbxFinance::find()->where(['year' => $i, 'month' => $j])->exists()) {
                     $dbx = new DB\DbxFinance(['year' => $i, 'month' => $j, 'downloaded' => 0]);
-                    $this->actionGenerateMonthTmpl($i, $j);
+                    // TODO not working DropBox
+                    //$this->actionGenerateMonthTmpl($i, $j);
                     $dbx->save();
                     Console::output('New month added : ' . sprintf('%02d', $i) . '.' . $j);
                 }
