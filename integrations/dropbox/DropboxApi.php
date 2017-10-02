@@ -55,17 +55,48 @@ class DropboxApi extends Object
         $this->curlContent->setHeader('Dropbox-API-Arg', Json::encode([
             'path' => $path,
         ]));
+        $this->curlContent->setHeader('Content-Type', "text/plain");
+        $this->curlContent->setRequestBody('');
     
     
         $this->curlContent->post($this->curlContentHost . '/2/files/download');
     
         $response = $this->normalizeResponse($this->curlContent);
-        $success = file_put_contents(realpath($downloadFilePath), $response);
+        $success = file_put_contents($downloadFilePath, $response);
         
         // downloaded file info
 //        $fileInfo = $this->curlContent->responseHeaders['dropbox-api-result'];
         
         return !!$success;
+    }
+    
+    public function filesUpload($dropboxPath, $localFilePath)
+    {
+        $this->curlContent->unsetHeader('Dropbox-API-Arg');
+        $this->curlContent->setHeader('Dropbox-API-Arg', Json::encode([
+            'path' => $dropboxPath,
+        ]));
+        $this->curlContent->setHeader('Content-Type', 'text/plain; charset=dropbox-cors-hack');
+        $this->curlContent->setRequestBody(file_get_contents($localFilePath));
+    
+        $this->curlContent->post($this->curlContentHost . '/2/files/upload');
+    
+        $response = $this->normalizeResponse($this->curlContent);
+        
+        return true;
+    }
+    
+    public function filesSearch($folder, $query)
+    {
+        $this->curlApi->setRequestBody(Json::encode([
+            'path' => $folder,
+            'query' => $query,
+        ]));
+        $this->curlApi->post($this->curlApiHost . '/2/files/search');
+    
+        $response = $this->normalizeResponse($this->curlApi);
+    
+        return !!count($response['matches']);
     }
     
     /**

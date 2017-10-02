@@ -225,8 +225,10 @@ class Wallet2016Controller extends Controller
         $monthStr = sprintf("%02d", $month);
         $filePath = '/finances/' . $year . '.' . $monthStr . '.xlsm';
         $output = Yii::getAlias('@temp/' . $year . '.' . $monthStr . '.xlsm');
-        $dbxClient = new  dbx\Client(Yii::$app->params['dbx_token'], 'directapp', 'UTF-8');
-        if (!is_null($dbxClient->getFile($filePath, fopen($output . '.tmp', 'w+')))) {
+        
+        /** @var DropboxApi $dropbox */
+        $dropbox = Yii::$app->dropbox;
+        if ($dropbox->filesSearch('/finances', $year . '.' . $monthStr . '.xlsm')) {
             Console::output('canceled! Already Exists!');
             return;
         }
@@ -290,10 +292,9 @@ class Wallet2016Controller extends Controller
         }
         $objWriter = \PHPExcel_IOFactory::createWriter($xlsx, 'Excel2007');
         $objWriter->save($output);
-        if (is_null($dbxClient->getFile($filePath, fopen($output . '.tmp', 'w+')))) {
-            $dbxClient->uploadFile($filePath, dbx\WriteMode::add(), fopen($output, 'rb'));
-            Console::output('ok!');
-        }
+        
+        $dropbox->filesUpload($filePath, $output);
+        Console::output('ok!');
     }
 
     public function actionGenerateDbxFinanceTbl()
@@ -307,8 +308,7 @@ class Wallet2016Controller extends Controller
             for ($j = ($i == $startYear) ? $startMonth : 1; $j <= $maxMonth; $j++) {
                 if (!DB\DbxFinance::find()->where(['year' => $i, 'month' => $j])->exists()) {
                     $dbx = new DB\DbxFinance(['year' => $i, 'month' => $j, 'downloaded' => 0]);
-                    // TODO not working DropBox
-                    //$this->actionGenerateMonthTmpl($i, $j);
+                    $this->actionGenerateMonthTmpl($i, $j);
                     $dbx->save();
                     Console::output('New month added : ' . sprintf('%02d', $i) . '.' . $j);
                 }
