@@ -212,7 +212,10 @@ class Wallet2016Controller extends Controller
         }
         /** @var DB\BalanceCheck $lastPoint */
         $lastPoint = end($points);
-        Console::output('Last check-point at: ' . ($lastPoint ? $lastPoint->date : 'no check-points found'));
+        Console::output($lastPoint
+            ? ('Last check-point at: ' . $lastPoint->date  . '. Real Balance: ' . $lastPoint->real)
+            : 'no check-points found'
+        );
         Console::output('Balance ok');
     }
 
