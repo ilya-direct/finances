@@ -5,10 +5,10 @@ namespace integrations\dropbox;
 
 use linslin\yii2\curl\Curl;
 use yii\base\Exception;
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\helpers\Json;
 
-class DropboxApi extends Object
+class DropboxApi extends BaseObject
 {
     public $accessToken;
     

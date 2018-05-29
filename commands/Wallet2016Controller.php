@@ -313,7 +313,7 @@ class Wallet2016Controller extends Controller
                     $dbx = new DB\DbxFinance(['year' => $i, 'month' => $j, 'downloaded' => 0]);
                     $this->actionGenerateMonthTmpl($i, $j);
                     $dbx->save();
-                    Console::output('New month added : ' . sprintf('%02d', $i) . '.' . $j);
+                    Console::output('New month added : ' . $i . '.' . sprintf('%02d', $j));
                 }
             }
         }
