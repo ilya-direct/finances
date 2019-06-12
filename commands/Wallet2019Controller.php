@@ -41,7 +41,8 @@ class Wallet2019Controller extends Controller
 
         /** @var DB\DbxFinance[] $recs */
         $recs = DB\DbxFinance::find()
-            ->where(['>=', 'year', 2016])
+            ->where(['>=', 'year', 2019])
+            ->andWhere(['>=', 'month', 6])
             ->orderBy([
                 'year' => SORT_ASC,
                 'month' => SORT_ASC,
@@ -80,7 +81,8 @@ class Wallet2019Controller extends Controller
         Console::output('Parsing downloaded files ...');
         /** @var DB\DbxFinance[] $fins */
         $fins = DB\DbxFinance::find()
-            ->where(['>=', 'year', 2016])
+            ->where(['>=', 'year', 2019])
+            ->where(['>=', 'month', 6])
             ->andWhere(['downloaded' => true, 'in_db' => false])
             ->orderBy([
                 'year' => SORT_ASC,
@@ -107,7 +109,12 @@ class Wallet2019Controller extends Controller
             $xlsx = new ExcelHelper($sheet);
 
             /** @var DB\Column[] $headers */
-            $headers = DB\Column::find()->where(['and', ['not', ['letter' => null]], ['deleted' => 0]])->all();
+            $headers = DB\Column::find()
+                ->where(['and', ['not', ['letter' => null]], ['deleted' => 0]])
+                ->orderBy([
+                    'letter' => SORT_ASC
+                ])
+                ->all();
 
             $xlsx->checkHeaders($headers); // проверка совпадения заголовков в файле с заданными
             // TODO: Заполнение начальной суммы
@@ -298,8 +305,8 @@ class Wallet2019Controller extends Controller
 
     public function actionGenerateDbxFinanceTbl()
     {
-        $startYear = 2016;
-        $startMonth = 1;
+        $startYear = 2019;
+        $startMonth = 6;
         $currentYear = (int)date('Y');
         $currentMonth = (int)date('m');
         for ($i = $startYear; $i <= $currentYear; $i++) {

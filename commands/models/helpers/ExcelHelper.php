@@ -22,20 +22,14 @@ class ExcelHelper
         foreach ($headers as $h) {
             switch ($h->name) {
                 case 'note':
-                    $cellValue = self::cellValue($this->getCell($h->letter, 7));
-                    break;
-                case 'realmoney':
-                    $cellValue = self::cellValue($this->getCell($h->letter, 4));
-                    break;
-                case 'correcting':
-                    $cellValue = self::cellValue($this->getCell($h->letter, 4));
+                    $cellValue = self::cellValue($this->getCell($h->letter, $headerRow - 1));
                     break;
                 default:
                     $cellValue = self::cellValue($this->getCell($h->letter, $headerRow));
             }
             if ($h->value != $cellValue) {
                 if(!($h->value=='Корректировка' && $cellValue=="Разница")){
-                    throw new \Exception("Unexpected header : {$cellValue}. {$h->value} expected");
+                    throw new \Exception("Wrong header value. Expected: `{$h->value}`. Given: `{$cellValue}`");
                 }
             }
         }
