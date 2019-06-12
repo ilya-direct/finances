@@ -108,6 +108,7 @@ class DropboxApi extends BaseObject
     {
         if ($curl->responseCode === 200) {
             $contentType = empty($curl->responseHeaders['Content-Type']) ? false : strtolower($curl->responseHeaders['Content-Type']);
+            $contentType = $contentType ? $contentType : (empty($curl->responseHeaders['content-type']) ? false : strtolower($curl->responseHeaders['content-type']));
             if ($contentType &&  ($contentType == 'application/json')) {
     
                 return Json::decode($curl->response);
