@@ -7,6 +7,8 @@ Yii::setAlias('@finance_download_path', Yii::getAlias('@data').DIRECTORY_SEPARAT
 Yii::setAlias('@finance_csv', Yii::getAlias('@data').DIRECTORY_SEPARATOR.'finance_csv');
 Yii::setAlias('@integrations', dirname(__DIR__) . '/integrations');
 
+$env = Dotenv\Dotenv::create(dirname(__DIR__));
+$env->load();
 
 $params = require(__DIR__ . '/params.php');
 
