@@ -103,7 +103,8 @@ class Record extends Yii\db\ActiveRecord
     static function setCorrection($date,$sum){
 
         $itemId=Item::getItemId('correction');
-        $attributes=['date'=>$date,'item_id'=>$itemId,'column_id'=>11];
+        $column = Column::findOne(['name' => 'correction']);
+        $attributes=['date'=>$date,'item_id'=>$itemId,'column_id'=>$column->id];
         $rec=Record::findOne($attributes);
         $rec=is_object($rec) ? $rec : new Record($attributes);
         $rec->sum=(int) $sum;

@@ -169,7 +169,8 @@ class Wallet2019Controller extends Controller
 
             // ------------------
             $date->setDate($fin->year, $fin->month, $maxDay);
-            $correctionCellValue = ExcelHelper::cellValue($sheet->getCell('Y' . ($zeroDayRow + $maxDay)));
+            $column = DB\Column::findOne(['name' => 'correction']);
+            $correctionCellValue = ExcelHelper::cellValue($sheet->getCell($column->letter . ($zeroDayRow + $maxDay)));
             if (!empty($correctionCellValue) || is_int($correctionCellValue)) {
                 DB\Record::setCorrection($date->format('Y-m-d'), $correctionCellValue);
             } else {
